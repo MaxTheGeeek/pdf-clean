@@ -77,13 +77,16 @@ Definition of Done (every task)
 - **Done when:** mixed tokens normalised, pure-script tokens untouched.
 
 ### T-012 — IdentifierDetector and redaction
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-004
 - **Covers:** FR-18
 - **Files:** `Sanitize/IdentifierDetector.swift`
 - **Do:** tech spec §6.9.
 - **Tests:** TC-U06.
 - **Done when:** positives/negatives pass; findings deterministic order.
+  - Note: this task implements detection only (`IdentifierDetector.detect`). The actual
+    `[REDACTED]` substitution at render time (`ExportOptions.redactedIdentifiers`) is
+    T-013's job, per its own Do line ("redaction at render time").
 
 ### T-013 — Renderers
 - **Status:** todo
