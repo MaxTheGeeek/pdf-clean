@@ -59,7 +59,7 @@ Definition of Done (every task)
 ## Phase 1 — Pure text processing (no PDFKit)
 
 ### T-010 — UnicodeSanitizer
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-004
 - **Covers:** FR-14, FR-15
 - **Files:** `Sanitize/UnicodeSanitizer.swift`, `Sanitize/UnicodeTables.swift`
