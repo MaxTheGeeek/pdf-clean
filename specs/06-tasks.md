@@ -35,11 +35,13 @@ Definition of Done (every task)
 - **Done when:** gates fail on a planted `URLSession` line and on a planted `print(text)`, and pass when removed.
 
 ### T-003 — Fixture harness skeleton
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-001
 - **Covers:** FR-02
-- **Files:** `Tests/PDFCleanKitTests/Fixtures/FixtureManifest.swift`, `FixtureSuiteTests.swift`
-- **Do:** Codable model for `manifest.json` (all fields of test plan §2), loader via `Bundle.module`, parameterised `@Test(arguments:)` over fixture ids. Until the pipeline exists, cases are `.disabled("pipeline pending")` except the `notAPDF` header check.
+- **Files:** `Tests/PDFCleanKitTests/FixtureManifest.swift`, `Tests/PDFCleanKitTests/FixtureSuiteTests.swift`
+- **Do:** Codable model for `manifest.json` (all fields of test plan §2), loader via `Bundle.module`, parameterised `@Test(arguments:)` over fixture ids. Until the pipeline exists, cases record a known issue ("pipeline pending") via `withKnownIssue` except the `notAPDF` header check.
+  - *Spec drift found during implementation:* the files cannot live under `Tests/PDFCleanKitTests/Fixtures/` as originally written — `Package.swift`'s `.copy("Fixtures")` resource rule claims that whole directory, so SwiftPM copies any `.swift` file placed there as an inert resource instead of compiling it (confirmed: it ended up as plain bytes inside the test bundle, absent from `swift package describe`'s source list). Moved both files to `Tests/PDFCleanKitTests/` directly, matching CLAUDE.md's own Layout note ("Fixtures/ (PDFs + manifest.json)" only).
+  - *Spec drift found during implementation:* `.disabled(...)` on a parameterised `@Test` skips the whole test before expanding arguments — Swift Testing reports one skipped test, not 14 — so "the suite lists 15 cases" is unreachable with that trait. Used `withKnownIssue(...)` inside the body instead: all 14 pending arguments still expand and run individually (visible in `swift test` output as separate cases), the suite stays green, and the signal "not implemented yet" is preserved via the known-issue annotation.
 - **Tests:** TC-F01 (skeleton).
 - **Done when:** the suite lists 15 cases; manifest decodes without loss (round-trip test).
 
