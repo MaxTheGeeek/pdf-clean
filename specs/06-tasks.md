@@ -46,13 +46,15 @@ Definition of Done (every task)
 - **Done when:** the suite lists 15 cases; manifest decodes without loss (round-trip test).
 
 ### T-004 — Core model, options, errors, constants
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-001
 - **Covers:** FR-19, NFR-07, NFR-09
 - **Files:** `Model/*.swift`, `Pipeline/PipelineError.swift`, `Constants.swift`
 - **Do:** implement tech spec §4–5 types exactly (Sendable, Equatable, Codable), `Constants` table §10.
 - **Tests:** Codable round-trip; `SanitizationReport` KeyPath table used by the harness.
 - **Done when:** types compile in Swift 6 mode with no warnings.
+  - *Spec gap filled during implementation:* `PipelineError.outputVerificationFailed([OutputViolation])` references a type the spec never defines (`OutputViolation` only appears as a name in §4/§6.11). Added a minimal `OutputViolation` enum next to `PipelineError` in `Pipeline/PipelineError.swift` with the four categories §6.11 names (forbidden code point, non-ASCII space, C0 control, metadata value leak) so the model compiles; flagged for review when `OutputVerifier` is implemented (T-014), since its real checks may need different associated data.
+  - *Spec drift found during implementation:* the tech spec's `SanitizationReport` "KeyPath table" can't be a stored `static let [String: KeyPath<...>]` — `KeyPath` is not `Sendable`, so Swift 6 strict concurrency rejects it as shared mutable global state. Implemented as `SanitizationReport.counterKeyPath(named:) -> KeyPath<SanitizationReport, Int>?`, a pure function with the same name-to-property mapping, computed fresh per call instead of stored.
 
 ## Phase 1 — Pure text processing (no PDFKit)
 
