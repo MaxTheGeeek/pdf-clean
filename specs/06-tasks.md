@@ -26,7 +26,7 @@ Definition of Done (every task)
 - **Done when:** all six commands succeed on a clean clone.
 
 ### T-002 — Static gates
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-001
 - **Covers:** NFR-01, NFR-02
 - **Files:** `scripts/check_offline.sh`, `scripts/check_specs.py`, `scripts/e2e.sh` (stub), `Makefile`
