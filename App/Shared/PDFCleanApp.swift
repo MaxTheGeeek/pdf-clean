@@ -9,7 +9,7 @@ struct PDFCleanApp: App {
             RootView()
         }
         #if os(macOS)
-        .defaultSize(width: 1100, height: 720)
+            .defaultSize(width: 1100, height: 720)
         #endif
     }
 }

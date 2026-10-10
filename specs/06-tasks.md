@@ -17,7 +17,7 @@ Definition of Done (every task)
 ## Phase 0 — Foundation
 
 ### T-001 — Verify scaffold and toolchain
-- **Status:** todo
+- **Status:** done
 - **Depends on:** —
 - **Covers:** NFR-04, NFR-07
 - **Files:** `Packages/PDFCleanKit/Package.swift`, `project.yml`, `App/Shared/*`, `Makefile`
