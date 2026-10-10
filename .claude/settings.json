@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(make *)",
+      "Bash(swift build *)",
+      "Bash(swift test *)",
+      "Bash(swift run *)",
+      "Bash(swift format *)",
+      "Bash(xcodebuild *)",
+      "Bash(xcodegen *)",
+      "Bash(xcrun simctl list *)",
+      "Bash(python3 scripts/check_specs.py)",
+      "Bash(./scripts/check_offline.sh)",
+      "Bash(./scripts/e2e.sh)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(git push --force *)",
+      "Edit(./Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/manifest.json)",
+      "Write(./Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/manifest.json)",
+      "Edit(./Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/*.pdf)",
+      "Write(./Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/*.pdf)"
+    ]
+  }
+}

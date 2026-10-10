@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "name": "pdfclean: hidden-content.pdf → .build-out",
+      "program": "${workspaceFolder}/Packages/PDFCleanKit/.build/debug/pdfclean",
+      "args": [
+        "${workspaceFolder}/Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/hidden-content.pdf",
+        "-o", "${workspaceFolder}/.build-out/hidden-content.md",
+        "--report", "${workspaceFolder}/.build-out/hidden-content.report.json"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build: package"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "name": "pdfclean: choose any PDF",
+      "program": "${workspaceFolder}/Packages/PDFCleanKit/.build/debug/pdfclean",
+      "args": ["${input:pdfPath}", "-o", "${workspaceFolder}/.build-out/out.md"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build: package"
+    }
+  ],
+  "inputs": [
+    { "id": "pdfPath", "type": "promptString", "description": "Absolute path to a PDF" }
+  ]
+}

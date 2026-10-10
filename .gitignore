@@ -1,0 +1,18 @@
+# Xcode / SwiftPM
+.build/
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcworkspace/xcuserdata/
+# Generated project (XcodeGen) — regenerate with `make generate`
+PDFClean.xcodeproj/
+# Local outputs
+.build-out/
+# Python
+.venv/
+__pycache__/
+*.pyc
+# macOS
+.DS_Store
+# Claude Code local settings
+.claude/settings.local.json

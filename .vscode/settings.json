@@ -1,0 +1,33 @@
+{
+  "swift.searchSubfoldersForPackages": true,
+  "swift.autoGenerateLaunchConfigurations": false,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[swift]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [120]
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "files.trimTrailingWhitespace": false
+  },
+  "files.exclude": {
+    "**/.build": true,
+    "**/.swiftpm": true,
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/.build": true,
+    "**/.venv": true,
+    "**/Fixtures/*.pdf": true
+  },
+  "files.readonlyInclude": {
+    "Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/**": true
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/yonaskolb/XcodeGen/master/Assets/json-schema/project.json": "project.yml"
+  }
+}

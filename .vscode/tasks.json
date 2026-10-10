@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "build: package", "type": "shell", "command": "make build", "group": { "kind": "build", "isDefault": true }, "problemMatcher": ["$swiftc"] },
+    { "label": "test: package", "type": "shell", "command": "make test", "group": { "kind": "test", "isDefault": true }, "problemMatcher": ["$swiftc"] },
+    { "label": "verify: all gates", "type": "shell", "command": "make verify", "group": "test", "problemMatcher": ["$swiftc"] },
+    { "label": "check: specs traceability", "type": "shell", "command": "make check-specs", "problemMatcher": [] },
+    { "label": "check: offline", "type": "shell", "command": "make check-offline", "problemMatcher": [] },
+    { "label": "app: generate Xcode project", "type": "shell", "command": "make generate", "problemMatcher": [] },
+    { "label": "app: build macOS", "type": "shell", "command": "make build-mac", "group": "build", "problemMatcher": ["$swiftc"] },
+    { "label": "app: build iOS (simulator)", "type": "shell", "command": "make build-ios", "group": "build", "problemMatcher": ["$swiftc"] },
+    { "label": "test: iOS simulator", "type": "shell", "command": "make test-ios", "group": "test", "problemMatcher": ["$swiftc"] },
+    { "label": "e2e: CLI over fixtures", "type": "shell", "command": "make e2e", "group": "test", "problemMatcher": [] },
+    { "label": "fixtures: regenerate", "type": "shell", "command": "make fixtures", "problemMatcher": [] },
+    { "label": "fixtures: verify", "type": "shell", "command": "make fixtures-verify", "problemMatcher": [] },
+    { "label": "app: open in Xcode", "type": "shell", "command": "make generate && open PDFClean.xcodeproj", "problemMatcher": [] }
+  ]
+}

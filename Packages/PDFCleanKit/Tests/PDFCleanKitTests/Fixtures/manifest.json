@@ -1,0 +1,466 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "id": "simple-structured",
+      "file": "simple-structured.pdf",
+      "covers": [
+        "FR-04",
+        "FR-06",
+        "FR-07",
+        "FR-09",
+        "FR-10",
+        "FR-12"
+      ],
+      "title": "Quarterly Infrastructure Report",
+      "headings": [
+        [
+          1,
+          "1 Introduction"
+        ],
+        [
+          2,
+          "1.1 Scope"
+        ],
+        [
+          2,
+          "1.2 Priorities"
+        ],
+        [
+          1,
+          "2 Results"
+        ],
+        [
+          2,
+          "2.1 Outcomes"
+        ]
+      ],
+      "listItems": [
+        {
+          "ordered": false,
+          "text": "Migrate legacy services to containers"
+        },
+        {
+          "ordered": false,
+          "text": "Consolidate monitoring dashboards into a single view for the operations team"
+        },
+        {
+          "ordered": true,
+          "text": "Alpha rollout in the staging region"
+        },
+        {
+          "ordered": true,
+          "text": "Beta rollout in the production region"
+        }
+      ],
+      "mustContain": [
+        "The new platform improves resilience across our infrastructure and reduces operating costs significantly.",
+        "Availability rose to ninety-nine point nine five percent for the quarter."
+      ],
+      "mustContainAfterFiltering": [
+        "and the migration continued without major incidents across all regions."
+      ],
+      "mustNotContain": [
+        "ACME Corp",
+        "Page 1 of 2",
+        "Page 2 of 2"
+      ],
+      "mustNotContainDerived": [
+        "infra- structure",
+        "infra-structure",
+        "migration\n\ncontinued"
+      ],
+      "separateParagraphs": [
+        [
+          "This report summarises",
+          "A second paragraph begins"
+        ]
+      ],
+      "ocrPages": [],
+      "reportAtLeast": {
+        "removedHeaderFooterLines": 4
+      },
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      }
+    },
+    {
+      "id": "toc",
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      },
+      "file": "toc.pdf",
+      "covers": [
+        "FR-06",
+        "FR-07",
+        "FR-08"
+      ],
+      "title": "Handbook of Offline Tools",
+      "tocEntries": [
+        [
+          1,
+          "1 Getting Started",
+          3
+        ],
+        [
+          2,
+          "1.1 Installation",
+          3
+        ],
+        [
+          2,
+          "1.2 Configuration",
+          3
+        ],
+        [
+          1,
+          "2 Advanced Usage",
+          4
+        ],
+        [
+          2,
+          "2.1 Batch Mode",
+          4
+        ]
+      ],
+      "headings": [
+        [
+          1,
+          "1 Getting Started"
+        ],
+        [
+          2,
+          "1.1 Installation"
+        ],
+        [
+          2,
+          "1.2 Configuration"
+        ],
+        [
+          1,
+          "2 Advanced Usage"
+        ],
+        [
+          2,
+          "2.1 Batch Mode"
+        ]
+      ],
+      "mustContain": [
+        "Edition 2026",
+        "Batch mode processes a folder of documents sequentially."
+      ],
+      "mustNotContainDerived": [
+        ".....",
+        ". . . ."
+      ],
+      "ocrPages": [],
+      "sourceInventory": {
+        "hasOutline": true,
+        "hasXMP": false,
+        "embeddedFileCount": 0
+      }
+    },
+    {
+      "id": "hidden-content",
+      "file": "hidden-content.pdf",
+      "covers": [
+        "FR-13",
+        "FR-14",
+        "FR-15",
+        "FR-16",
+        "FR-17",
+        "FR-18",
+        "FR-19",
+        "FR-22"
+      ],
+      "title": "Confidential Briefing",
+      "headings": [
+        [
+          1,
+          "Summary"
+        ],
+        [
+          1,
+          "Details"
+        ]
+      ],
+      "mustContain": [
+        "This is the visible briefing text that must survive extraction.",
+        "Visible paragraph text with hidden marks.",
+        "Tag smuggling test sentence.",
+        "Bidi control characters are removed.",
+        "The password policy applies to all staff.",
+        "Spacing test with odd whitespace.",
+        "Reference: 3f2a9c1e-77b4-4c2e-9d1a-0b6e5f4a3c21",
+        "The final visible sentence on page one.",
+        "Typography quickly gauges jumpy glyph descenders.",
+        "Second page visible content is preserved as well."
+      ],
+      "mustContainAfterFiltering": [
+        "Inline check: alpha omega closes the line."
+      ],
+      "mustNotContain": [
+        "CANARY-WHITE-TEXT",
+        "CANARY-INVISIBLE-RENDER",
+        "CANARY-COVERED-TEXT",
+        "CANARY-TINY-TEXT",
+        "CANARY-OFFPAGE",
+        "CANARY-CLIPPED",
+        "CANARY-WATERMARK",
+        "CANARY-ROTATED",
+        "CANARY-FOOTER-ID",
+        "CANARY-ANNOT-COMMENT",
+        "CANARY-LINK",
+        "CANARY-FORM-VALUE",
+        "CANARY-META-TITLE",
+        "CANARY-META-AUTHOR",
+        "CANARY-META-KEYWORDS",
+        "CANARY-META-CUSTOM",
+        "CANARY-XMP-DOCID",
+        "CANARY-XMP-DESCRIPTION",
+        "CANARY-ATTACH-PAYLOAD",
+        "CANARY-INLINE-WHITE",
+        "CANARY-TIGHT-WHITE",
+        "CANARY-ZWVARIANT",
+        "max@example.com",
+        "7F3A-99X2",
+        "Copy #00417",
+        "Northwind Traders"
+      ],
+      "mustNotContainDerived": [
+        "SummarySummary",
+        "Summary Summary"
+      ],
+      "mustNotContainCodepoints": [
+        "200B",
+        "200C",
+        "2060",
+        "FEFF",
+        "202A",
+        "202C",
+        "2066",
+        "2069",
+        "3000",
+        "2009",
+        "00A0",
+        "0430",
+        "043E",
+        "E0041",
+        "E0043",
+        "E004E",
+        "E0052",
+        "E0059"
+      ],
+      "occurrences": {
+        "Summary": 1
+      },
+      "suspiciousIdentifiers": [
+        "3f2a9c1e-77b4-4c2e-9d1a-0b6e5f4a3c21"
+      ],
+      "ocrPages": [],
+      "reportAtLeast": {
+        "removedHiddenWords": 7,
+        "removedTinyGlyphs": 7,
+        "removedOffPageWords": 1,
+        "removedInvisibleCodepoints": 4,
+        "removedRepeatedLines": 4,
+        "removedHeaderFooterLines": 2,
+        "removedRotatedRuns": 2,
+        "normalizedHomoglyphs": 2,
+        "removedOverlappingDuplicates": 1
+      },
+      "sourceInventory": {
+        "hasXMP": true,
+        "embeddedFileCount": 1,
+        "minAnnotationCount": 3,
+        "hasFormFields": true,
+        "metadataKeysInclude": [
+          "Author",
+          "Creator",
+          "Keywords",
+          "Producer",
+          "Title",
+          "TrackingID"
+        ]
+      }
+    },
+    {
+      "id": "two-column",
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      },
+      "file": "two-column.pdf",
+      "covers": [
+        "FR-11"
+      ],
+      "title": "Two Column Article",
+      "orderedPhrases": [
+        "Left column begins",
+        "Left column ends",
+        "Right column begins",
+        "Right column ends"
+      ],
+      "ocrPages": []
+    },
+    {
+      "id": "scanned",
+      "file": "scanned.pdf",
+      "covers": [
+        "FR-05"
+      ],
+      "ocrTolerant": true,
+      "title": "Scanned page sample",
+      "mustContain": [
+        "must be recovered with offline OCR on the device.",
+        "No network access is ever required for recognition."
+      ],
+      "ocrPages": [
+        1
+      ]
+    },
+    {
+      "id": "scanned-with-ocr-layer",
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      },
+      "file": "scanned-with-ocr-layer.pdf",
+      "covers": [
+        "FR-04",
+        "FR-13"
+      ],
+      "title": "Searchable scan sample",
+      "mustContain": [
+        "This page was produced as an image so that the text",
+        "No network access is ever required for recognition."
+      ],
+      "ocrPages": [],
+      "comment": "Invisible OCR text over a scanned image is legitimate and MUST be kept: ink exists under it."
+    },
+    {
+      "id": "encrypted-ok",
+      "file": "encrypted-user-password.pdf",
+      "covers": [
+        "FR-02"
+      ],
+      "password": "open-sesame",
+      "mustContain": [
+        "Encrypted content unlocked with the correct password."
+      ],
+      "ocrPages": []
+    },
+    {
+      "id": "encrypted-missing-password",
+      "file": "encrypted-user-password.pdf",
+      "covers": [
+        "FR-02"
+      ],
+      "expectError": "passwordRequired"
+    },
+    {
+      "id": "encrypted-wrong-password",
+      "file": "encrypted-user-password.pdf",
+      "covers": [
+        "FR-02"
+      ],
+      "password": "wrong",
+      "expectError": "wrongPassword"
+    },
+    {
+      "id": "copy-restricted",
+      "file": "copy-restricted.pdf",
+      "covers": [
+        "FR-03"
+      ],
+      "expectError": "copyingNotPermitted"
+    },
+    {
+      "id": "copy-restricted-owner",
+      "file": "copy-restricted.pdf",
+      "covers": [
+        "FR-03"
+      ],
+      "password": "owner-only",
+      "ownerPasswordCase": true,
+      "mustContain": [
+        "The author disallowed text copying for this document."
+      ],
+      "ocrPages": []
+    },
+    {
+      "id": "unicode-normalization",
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      },
+      "file": "unicode-normalization.pdf",
+      "covers": [
+        "FR-14",
+        "FR-15"
+      ],
+      "title": "Unicode Normalisation",
+      "mustContain": [
+        "The financial flow is reviewed monthly.",
+        "Größe und Übersicht der Straße bleiben erhalten.",
+        "L’élève a réussi l’examen.",
+        "Information with a soft hyphen.",
+        "Standalone marks survive : a – b . c _ d ( e ) f , g ; h · i"
+      ],
+      "mustNotContainCodepoints": [
+        "FB01",
+        "FB02",
+        "00AD"
+      ],
+      "ocrPages": []
+    },
+    {
+      "id": "not-a-pdf",
+      "file": "not-a-pdf.pdf",
+      "covers": [
+        "FR-02"
+      ],
+      "expectError": "notAPDF"
+    },
+    {
+      "id": "truncated",
+      "file": "truncated.pdf",
+      "covers": [
+        "NFR-06"
+      ],
+      "expectNoCrash": true
+    },
+    {
+      "id": "perf-200-pages",
+      "reportExactly": {
+        "removedHiddenWords": 0,
+        "removedTinyGlyphs": 0,
+        "removedRotatedRuns": 0,
+        "removedOffPageWords": 0
+      },
+      "file": "perf-200-pages.pdf",
+      "covers": [
+        "NFR-03"
+      ],
+      "mustContain": [
+        "Chapter 1",
+        "Chapter 200"
+      ],
+      "headingCount": 200,
+      "ocrPages": [],
+      "maxSeconds": 20
+    }
+  ]
+}

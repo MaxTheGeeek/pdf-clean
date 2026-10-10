@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "swiftlang.swift-vscode",
+    "anthropic.claude-code",
+    "redhat.vscode-yaml",
+    "davidanson.vscode-markdownlint",
+    "ms-python.python",
+    "editorconfig.editorconfig"
+  ]
+}

@@ -1,0 +1,91 @@
+# XcodeGen project definition. Generate with `make generate` (brew install xcodegen).
+# PDFClean.xcodeproj is generated and git-ignored: edit THIS file, not the project.
+name: PDFClean
+options:
+  bundleIdPrefix: com.maxbehzadi
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    DEAD_CODE_STRIPPING: YES
+    # Set your team for device builds / archiving (Xcode > Signing & Capabilities):
+    DEVELOPMENT_TEAM: ""
+packages:
+  PDFCleanKit:
+    path: Packages/PDFCleanKit
+targets:
+  PDFClean-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - path: App/Shared
+      - path: App/Resources
+        buildPhase: resources
+    dependencies:
+      - package: PDFCleanKit
+        product: PDFCleanKit
+    entitlements:
+      path: App/macOS/PDFClean.entitlements
+      properties:
+        # Constitution P1: sandboxed, user-selected files only, NO network entitlements.
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-write: true
+    settings:
+      base:
+        PRODUCT_NAME: PDFClean
+        PRODUCT_BUNDLE_IDENTIFIER: com.maxbehzadi.pdfclean
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: PDFClean
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: YES
+  PDFClean-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Shared
+      - path: App/Resources
+        buildPhase: resources
+    dependencies:
+      - package: PDFCleanKit
+        product: PDFCleanKit
+    settings:
+      base:
+        PRODUCT_NAME: PDFClean
+        PRODUCT_BUNDLE_IDENTIFIER: com.maxbehzadi.pdfclean
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: PDFClean
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+schemes:
+  PDFClean-macOS:
+    build:
+      targets:
+        PDFClean-macOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  PDFClean-iOS:
+    build:
+      targets:
+        PDFClean-iOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release

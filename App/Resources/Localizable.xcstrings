@@ -1,0 +1,19 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "PDFClean" : {
+      "shouldTranslate" : false
+    },
+    "Works offline. Nothing leaves this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktioniert offline. Nichts verlässt dieses Gerät."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
