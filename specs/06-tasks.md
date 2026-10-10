@@ -89,13 +89,27 @@ Definition of Done (every task)
     T-013's job, per its own Do line ("redaction at render time").
 
 ### T-013 — Renderers
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-004, T-012
 - **Covers:** FR-21, FR-17, FR-18
 - **Files:** `Export/MarkdownRenderer.swift`, `HTMLRenderer.swift`, `PlainTextRenderer.swift`, `DocumentExporter.swift`, `Export/Resources/print.css` (embedded as a string constant)
 - **Do:** tech spec §6.10, redaction at render time, suggested file names.
 - **Tests:** TC-U07, TC-U08, TC-U09, TC-U10, TC-U12.
 - **Done when:** golden files in `Tests/.../Golden/` match byte for byte.
+  - *Spec drift found during implementation:* `Export/Resources/print.css` is a Swift file
+    (`PrintCSS.swift`, a string constant), not a literal `.css` resource — same reasoning
+    as T-003's drift note: the HTML export must stay self-contained offline, and a real
+    resource file would need `Package.swift` resource wiring that doesn't mix with
+    compiled sources in the same directory.
+  - *Interpretation:* "blocks separated by exactly one blank line" is applied per
+    semantic group, not per `[Block]` array element — a run of consecutive `listItem`
+    blocks (same ordered-ness) renders as one unbroken list with no blank lines between
+    its own items (otherwise Markdown would parse each item as a separate list).
+  - `DocumentExporter.render` does not yet call `OutputVerifier` — that gate is T-014's
+    job per its own Do line.
+  - Golden tests live alongside their renderer tests in `Tests/.../Unit/` (hardcoded
+    expected strings in test code) rather than separate files under `Tests/.../Golden/`;
+    `Golden/README.txt` predates this and the directory stays unused for now.
 
 ### T-014 — OutputVerifier and CleanFileWriter
 - **Status:** todo
