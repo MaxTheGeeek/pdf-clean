@@ -68,7 +68,7 @@ Definition of Done (every task)
 - **Done when:** all listed tests pass; function is pure and returns counters.
 
 ### T-011 — HomoglyphNormalizer
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-010
 - **Covers:** FR-15
 - **Files:** `Sanitize/HomoglyphNormalizer.swift`
