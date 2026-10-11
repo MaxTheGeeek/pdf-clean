@@ -197,7 +197,7 @@ Definition of Done (every task)
     as a follow-up if full coverage is needed.
 
 ### T-025 — Repeated content filter
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-020
 - **Covers:** FR-12, FR-16
 - **Files:** `Sanitize/RepeatedContentFilter.swift`
