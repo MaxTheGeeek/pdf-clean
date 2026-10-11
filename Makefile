@@ -10,7 +10,7 @@ OUT      := .build-out
 SIM_ID   ?= $(shell xcrun simctl list devices available 2>/dev/null | grep -m1 -E '^[[:space:]]+iPhone' | grep -oE '[0-9A-F-]{36}')
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap generate build test build-mac build-ios test-ios run-cli e2e \
+.PHONY: help bootstrap generate generate-icon build test build-mac build-ios test-ios run-cli e2e \
         format lint check-offline check-specs verify coverage fixtures fixtures-verify clean
 
 help: ## Show this help
@@ -24,6 +24,9 @@ bootstrap: ## Install dev tools (XcodeGen) and the Python fixture venv
 
 generate: ## Generate PDFClean.xcodeproj from project.yml
 	xcodegen generate --spec project.yml
+
+generate-icon: ## Generate macOS and iOS app icon PNGs
+	swift scripts/generate_app_icon.swift App/Resources/Assets.xcassets/AppIcon.appiconset
 
 build: ## Build the Swift package (library + CLI)
 	swift build --package-path $(PKG)

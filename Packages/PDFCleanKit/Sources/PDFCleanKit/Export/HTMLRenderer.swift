@@ -34,6 +34,11 @@ enum HTMLRenderer {
         var pieces: [String] = []
         var listBuffer = ""
         var stack: [Bool] = []
+        var paragraphBuffer = ""
+
+        func appendParagraphText(_ text: String) {
+            paragraphBuffer += (paragraphBuffer.isEmpty ? "" : " ") + text
+        }
 
         func closeLists(to depth: Int) {
             while stack.count > depth {
@@ -50,9 +55,24 @@ enum HTMLRenderer {
             }
         }
 
+        func flushParagraph() {
+            guard !paragraphBuffer.isEmpty else { return }
+            pieces.append("<p>\(paragraphBuffer)</p>")
+            paragraphBuffer = ""
+        }
+
         for block in blocks {
+            if case .paragraph(let text) = block {
+                appendParagraphText(escape(text))
+                continue
+            }
+            if case .math(let math) = block, math.kind == .inline {
+                appendParagraphText("<span class=\"math inline\">\(escape(math.text))</span>")
+                continue
+            }
             guard case .listItem(let item) = block else {
                 flushList()
+                flushParagraph()
                 pieces.append(renderBlock(block))
                 continue
             }
@@ -75,6 +95,7 @@ enum HTMLRenderer {
             }
             listBuffer += "<li>\(escape(item.text))"
         }
+        flushParagraph()
         flushList()
         return pieces.joined(separator: "\n\n")
     }
@@ -95,6 +116,8 @@ enum HTMLRenderer {
             return renderTOC(heading: heading, entries: entries)
         case .preformatted(let text):
             return "<pre>\(escape(text))</pre>"
+        case .math(let math):
+            return math.kind == .display ? "<p class=\"math display\">\(escape(math.text))</p>" : "<span class=\"math inline\">\(escape(math.text))</span>"
         case .pageBreak:
             return "<hr>"
         }

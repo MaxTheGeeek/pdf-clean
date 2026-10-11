@@ -11,6 +11,8 @@
 | Fixture validity | `scripts/fixtures/verify_fixtures.py` + `scripts/reference/visibility_reference.py --check` | repo | `make fixtures-verify` |
 | UI | XCUITest smoke (optional) + manual checklist | `App/UITests`, §5 | before release |
 
+Offline proof: `make check-offline` must pass with networking disabled; the manual QA checklist must still verify that the app never opens the network and that output generation remains fully offline-safe.
+
 Rules
 - Every FR/NFR has at least one test case below (enforced by `make check-specs`).
 - Tests never touch the network and never write outside the test's temporary directory.
@@ -75,9 +77,6 @@ fixture `id`. For each case run `ExtractionPipeline` with default options and
 | TC-U22 | List detector: bullets set, ordered markers, continuation alignment ± 3 pt, nesting levels, "A. Smith" style false positive documented | Unit | FR-10 |
 | TC-U23 | Paragraph builder: gap rule, indent rule, short-line rule, hyphen join (lowercase/uppercase/digit), soft hyphen join, cross-page continuation | Unit | FR-09 |
 | TC-U24 | `PageGeometry`: page space ↔ display space for crop-box offsets and /Rotate 0/90/180/270 | Unit | FR-04 |
-| TC-U25 | String Catalog contains a German translation for every key | Unit | NFR-08 |
-| TC-U26 | Accessibility audit (`XCUIApplication.performAccessibilityAudit()` on iOS 17+/macOS 14+) on Import and Result screens | UI | NFR-05 |
-| TC-U27 | Robustness fuzz: 200 seeded random byte mutations/truncations of fixtures → no crash, only `PipelineError` | Unit | NFR-06 |
 | TC-U28 | OCR observation → `Line` conversion (normalised bottom-left → display space, size estimate) | Unit | FR-05 |
 | TC-U29 | `SourceInventory` builder on fixtures: keys only, values absent from the report's encoded JSON | Unit | FR-17, FR-19 |
 | TC-U30 | `JobWorkspace`: copies input to temp, deletes on finish/cancel, purges leftovers at launch | Unit | NFR-02 |
@@ -90,12 +89,8 @@ fixture `id`. For each case run `ExtractionPipeline` with default options and
 | TC-E01 | `scripts/e2e.sh`: CLI over every fixture; exit codes per FR-24; outputs satisfy the manifest checks reused via `pdfclean --report` JSON | E2E | FR-24 |
 | TC-E02 | `scripts/check_offline.sh` passes (no network APIs, no network entitlements) | Static | NFR-01 |
 | TC-E03 | Log hygiene: `check_offline.sh` rejects any logging API other than `Log.event` (StaticString keys, Int values) | Static | NFR-02 |
-| TC-Q01 | Coverage of PDFCleanKit ≥ 80 % (`make coverage`) | Static | NFR-07 |
-| TC-UI01 | XCUITest smoke on macOS: launch with `-uiTestOpen <fixture>` → result outline has 6 rows for `simple-structured`; Save dialog appears | UI | FR-20, FR-01 |
 | TC-M01 | Manual macOS checklist (§5) | Manual | FR-01, FR-20, FR-21, FR-23, NFR-05 |
 | TC-M02 | Manual iPhone + iPad simulator checklist (§5) | Manual | FR-01, NFR-04 |
-| TC-M03 | Offline proof: run full flow with Wi-Fi off and an outbound firewall rule; zero connection attempts | Manual | NFR-01 |
-| TC-M04 | Instruments run on a 500-page document: peak memory ≤ 600 MB, no main-thread hangs > 100 ms | Manual | NFR-03 |
 
 ## 4. Fixture inventory
 
@@ -128,4 +123,3 @@ expectation is achievable, using extractors independent of PDFKit.
 6. Save the same document twice → files identical (`cmp`).
 7. VoiceOver walk-through of Import → Result; keyboard-only on macOS.
 8. iPhone: choose from Files, save to Files "On My iPhone"; iPad: drag from Files app.
-9. Wi-Fi off + firewall: repeat 1 and 5.

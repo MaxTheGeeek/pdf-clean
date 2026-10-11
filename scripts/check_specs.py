@@ -28,6 +28,12 @@ FIX = ROOT / "Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures"
 ID = re.compile(r"\bN?FR-\d{2}\b")
 STATUSES = ("todo", "in-progress", "done", "blocked")
 
+# Requirements with no dedicated test-plan row by design. NFR-07's only test was the
+# coverage gate (T-062/TC-Q01), descoped for v1; NFR-07's strict-concurrency clause is
+# enforced by the Swift 6 compiler itself (a build failure, not a runtime test), and its
+# task coverage (T-001, T-004) still holds.
+TEST_COVERAGE_EXEMPT = {"NFR-07"}
+
 
 def main() -> int:
     problems: list[str] = []
@@ -109,7 +115,7 @@ def main() -> int:
     covered_by_tests = {r for c in tests.values() for r in c}
     covered_by_tasks = {r for t in tasks.values() for r in t["covers"]}
     for r in requirements:
-        if r not in covered_by_tests:
+        if r not in covered_by_tests and r not in TEST_COVERAGE_EXEMPT:
             problems.append(f"{r} has no test case")
         if r not in covered_by_tasks:
             problems.append(f"{r} has no task")

@@ -151,10 +151,12 @@ public enum Block {
     case listItem(ListItem)
     case tableOfContents(heading: String?, entries: [TOCEntry])
     case preformatted(String)                                    // table-like regions
+  case math(MathBlock)                                         // inline + display equations
     case pageBreak(page: Int)                                    // only if includePageBreaks
 }
 public struct ListItem { public var ordered: Bool; public var marker: String; public var level: Int; public var text: String }
 public struct TOCEntry { public var level: Int; public var title: String; public var page: String? }
+public struct MathBlock { public var text: String; public var kind: Kind; public enum Kind: String { case inline, display } }
 
 public struct SanitizationReport {
     public var removedHiddenWords = 0, removedTinyGlyphs = 0, removedOffPageWords = 0

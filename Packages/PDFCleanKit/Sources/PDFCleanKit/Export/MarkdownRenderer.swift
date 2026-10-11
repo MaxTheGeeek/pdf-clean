@@ -10,6 +10,8 @@ enum MarkdownRenderer {
         var pieces: [String] = []
         var listLines: [String] = []
         var listOrdered: Bool?
+        var paragraphBuffer: String?
+
         func flushList() {
             guard !listLines.isEmpty else { return }
             pieces.append(listLines.joined(separator: "\n"))
@@ -17,8 +19,23 @@ enum MarkdownRenderer {
             listOrdered = nil
         }
 
+        func flushParagraph() {
+            guard let buffer = paragraphBuffer, !buffer.isEmpty else { return }
+            pieces.append(buffer)
+            paragraphBuffer = nil
+        }
+
+        func appendParagraphText(_ text: String) {
+            if paragraphBuffer == nil {
+                paragraphBuffer = text
+            } else {
+                paragraphBuffer! += " " + text
+            }
+        }
+
         for block in document.blocks {
             if case .listItem(let item) = block {
+                flushParagraph()
                 if let listOrdered, listOrdered != item.ordered {
                     flushList()
                 }
@@ -26,9 +43,19 @@ enum MarkdownRenderer {
                 listLines.append(renderListItem(item))
                 continue
             }
+            if case .paragraph(let text) = block {
+                appendParagraphText(escape(text))
+                continue
+            }
+            if case .math(let math) = block, math.kind == .inline {
+                appendParagraphText("$\(escape(math.text))$")
+                continue
+            }
+            flushParagraph()
             flushList()
             pieces.append(renderBlock(block, hasTitle: hasTitle))
         }
+        flushParagraph()
         flushList()
 
         let body = pieces.joined(separator: "\n\n")
@@ -50,6 +77,9 @@ enum MarkdownRenderer {
             return renderTOC(heading: heading, entries: entries)
         case .preformatted(let text):
             return "```\n\(text)\n```"
+        case .math(let math):
+            let body = escape(math.text)
+            return math.kind == .display ? "$$\n\(body)\n$$" : "$\(body)$"
         case .pageBreak:
             return "---"
         }

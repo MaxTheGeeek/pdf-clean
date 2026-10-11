@@ -1,9 +1,10 @@
 # 01 · Requirements
 
 **Product:** PDFClean — an offline macOS and iOS/iPadOS app that turns a PDF into a
-clean, structured text document (title, headings, table of contents, paragraphs,
-lists) with every hidden token, identifier and piece of metadata removed, so the
-result can be shared with AI tools or anyone else safely.
+faithful, structured text document (title, headings, table of contents, paragraphs,
+lists, and math blocks) with every hidden token, identifier and piece of metadata
+removed, so the result can be shared with AI tools or anyone else safely while
+preserving the original document's meaning and visual hierarchy.
 
 **Primary flow:** Open PDF → wait for extraction → review structured result → save
 (Markdown, HTML or plain text).
@@ -53,8 +54,9 @@ Each requirement has acceptance criteria (AC). Fixture IDs refer to
 - AC1: `copy-restricted` → `copyingNotPermitted`; with owner password `owner-only` it extracts.
 
 ### FR-04 — Extract text in reading order
-- Text-based pages are extracted with PDFKit using character geometry, rebuilt into words and lines in visual reading order (top-to-bottom, left-to-right; right-to-left lines for RTL scripts).
+- Text-based pages are extracted with PDFKit using character geometry, rebuilt into words and lines in visual reading order (top-to-bottom, left-to-right; right-to-left lines for RTL scripts), while keeping semantic structure and style hierarchy intact.
 - AC1: `simple-structured`, `scanned-with-ocr-layer` and `encrypted-ok` produce all `mustContain` phrases.
+- AC2: the extracted model preserves title/heading emphasis and the distinct treatment of inline/display math blocks rather than flattening them into ordinary paragraphs.
 
 ### FR-05 — OCR fallback for scanned pages (on device)
 - A page whose text layer yields no visible words but has visible ink is recognised with Vision (`VNRecognizeTextRequest`, accurate, language correction on). Languages default to English and German; automatic language detection on.
@@ -77,6 +79,7 @@ Each requirement has acceptance criteria (AC). Fixture IDs refer to
 
 ### FR-09 — Rebuild paragraphs
 - Lines join into paragraphs; hyphenated line breaks are repaired; a paragraph interrupted by a page break (and running headers/footers) continues on the next page; new paragraphs start on larger vertical gaps, indentation, or a short line ending a sentence.
+- Math blocks remain distinct from body paragraphs, including inline formulas and displayed equations.
 - AC1: `simple-structured` `mustContain`/`mustContainAfterFiltering` phrases match and `separateParagraphs` pairs are in different blocks; `mustNotContainDerived` never appears.
 
 ### FR-10 — Detect lists
@@ -131,6 +134,7 @@ Each requirement has acceptance criteria (AC). Fixture IDs refer to
 
 ### FR-21 — Export clean files
 - Formats: Markdown (`.md`, default), HTML (`.html`, self-contained, print-friendly) and plain text (`.txt`). UTF-8 without BOM, LF line endings, final newline.
+- Equations and mathematical blocks are exported in a math-friendly representation so they are not flattened into plain prose. Display math stays separate from normal paragraphs; inline math remains inline.
 - Suggested file name: `<original-stem>-clean.<ext>` (stem sanitised to `[A-Za-z0-9 ._-]`); option "Neutral file name" → `document-clean.<ext>`.
 - Files contain no generator tags, timestamps, comments or metadata. On macOS, extended attributes are stripped after writing (best effort).
 - AC1: exported files for every success fixture start with document content (Markdown `# ` or text) or `<!doctype html>`; HTML contains only `charset`/`viewport` meta tags.
@@ -175,15 +179,13 @@ Each requirement has acceptance criteria (AC). Fixture IDs refer to
 ### NFR-07 — Maintainability
 - Core logic in Swift package `PDFCleanKit` with ≥ 80 % line coverage; app target contains only UI and glue. Swift 6 language mode, strict concurrency. Every heuristic constant is named and documented.
 
-### NFR-08 — Localisation
-- UI strings in a String Catalog; English required, German provided (Austrian/German users). Extraction works for any Latin, Cyrillic, Greek, Arabic-script and CJK text that PDFKit can read.
-
 ### NFR-09 — Determinism
 - Same input + options ⇒ byte-identical outputs on the same OS version.
 
 ## 5. Out of scope (v1)
 
-- Reconstructing tables as real tables (table-like regions are kept as preformatted text), images/figures, footnote linking, mathematical formulae.
+- Reconstructing tables as real tables (table-like regions are kept as preformatted text), images/figures, footnote linking.
+	- Mathematical formulae are now in scope as first-class content and must be preserved as inline or display maths.
 - DOCX/PDF export (backlog T-090/T-091), editing the text in-app, batch processing in the UI, Windows/Android/Linux.
 - Removing visible content other than repeated lines/headers/footers (users redact identifiers explicitly).
 - Detecting hidden text in OCR text layers that sits over real ink (see sanitisation spec §8, backlog T-092).

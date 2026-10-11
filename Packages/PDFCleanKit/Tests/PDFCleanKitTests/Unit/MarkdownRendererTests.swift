@@ -58,6 +58,23 @@ struct MarkdownRendererTests {
         #expect(MarkdownRenderer.render(document) == "# T\n\n###### Deep\n")
     }
 
+    @Test("math regions stay distinct from ordinary paragraphs")
+    func rendersInlineAndDisplayMathBlocks() {
+        let document = ExtractedDocument(
+            blocks: [
+                .paragraph("A quick check."),
+                .math(MathBlock(text: "E = mc^2", kind: .inline)),
+                .math(MathBlock(text: "a^2 + b^2 = c^2", kind: .display)),
+            ],
+            report: SanitizationReport(),
+            pageCount: 1
+        )
+        #expect(
+                MarkdownRenderer.render(document) ==
+                    "A quick check. $E = mc^2$\n\n$$\na^2 + b^2 = c^2\n$$\n"
+        )
+    }
+
     @Test(
         "characters are escaped anywhere in text",
         arguments: [

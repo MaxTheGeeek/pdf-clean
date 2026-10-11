@@ -211,6 +211,53 @@ Definition of Done (every task)
 - **Tests:** TC-U17.
 - **Done when:** Rules A/B/C and the "Chapter N" guard pass.
 
+## Phase 4 — Faithful reconstruction and visual fidelity
+
+### T-100 — Fidelity baseline and test fixture set
+- **Status:** in-progress
+- **Depends on:** T-031, T-022, T-024
+- **Covers:** FR-04, FR-06, FR-07, FR-09, FR-11, FR-13, FR-20, NFR-09
+- **Files:** `specs/01-requirements.md`, `specs/02-technical-spec.md`, `Packages/PDFCleanKit/Tests/PDFCleanKitTests/*`, `Layout/*`, `Pipeline/*`
+- **Do:** create a fidelity test set covering title weight, heading hierarchy, list formatting, multi-page continuation, equation blocks, and a document with mixed semantic blocks. Freeze expected behaviour in tests before implementation.
+- **Tests:** TC-FID-01, TC-FID-02, TC-FID-03, TC-FID-04.
+- **Done when:** the suite fails only on missing fidelity behaviour, not on syntax/logic errors.
+
+### T-101 — Preserve semantic style and hierarchy in the document model
+- **Status:** todo
+- **Depends on:** T-100
+- **Covers:** FR-04, FR-06, FR-07, FR-09, FR-20
+- **Files:** `Model/*.swift`, `Layout/*.swift`, `Extraction/*.swift`
+- **Do:** extend the internal document model so title, heading, emphasis, list item, block quote, code block, and math block keep their semantic role and style metadata. This is not a plain-text stream; it is a structured document model that retains visual intent and hierarchy.
+- **Tests:** TC-FID-05, TC-FID-06, TC-FID-07.
+- **Done when:** the document model records style markers and hierarchy without flattening them into plain paragraphs.
+
+### T-102 — Detect and preserve math blocks and inline formulas
+- **Status:** todo
+- **Depends on:** T-101
+- **Covers:** FR-04, FR-09, FR-20, NFR-09
+- **Files:** `Layout/*.swift`, `Extraction/*.swift`, `Export/*.swift`
+- **Do:** detect display math blocks and inline math expressions separately from normal prose, preserve them in a math-friendly representation (e.g. TeX-like text or accessible MathML equivalent), and keep them distinct from paragraphs and headings.
+- **Tests:** TC-FID-08, TC-FID-09, TC-FID-10.
+- **Done when:** inline and display math are never flattened into ordinary text and remain identifiable in export output.
+
+### T-103 — Multi-page faithful export with standard layout rules
+- **Status:** todo
+- **Depends on:** T-100, T-101, T-102
+- **Covers:** FR-20, FR-21, FR-22, NFR-09
+- **Files:** `Export/*.swift`, `Layout/*.swift`
+- **Do:** export the faithful model to Markdown/HTML/plain text using page-aware layout rules, standard margins, heading spacing, and multi-page continuation logic. Prevent the broken behavior where a multi-page document collapses into a single page or visually overlaps.
+- **Tests:** TC-FID-11, TC-FID-12, TC-FID-13.
+- **Done when:** saved output preserves structure, style, and page flow without layout corruption.
+
+### T-104 — Final fidelity pass and regression review
+- **Status:** todo
+- **Depends on:** T-103
+- **Covers:** FR-04, FR-06, FR-07, FR-09, FR-13, FR-20, FR-21, FR-22
+- **Files:** `Packages/PDFCleanKit/**`, `App/Shared/**`, `scripts/**`
+- **Do:** run the fidelity fixture set, the existing sanitization tests, and the export verification gates; confirm the app preserves visible structure and cleans hidden content without breaking multi-page output.
+- **Tests:** full `make verify`, fidelity suite, export verification.
+- **Done when:** all gates are green and the faithful-output requirement is proven by fixture evidence.
+
 ## Phase 3 — PDF extraction (PDFKit, CoreGraphics, Vision)
 
 ### T-030 — DocumentOpener and SourceInventory
@@ -384,7 +431,7 @@ Definition of Done (every task)
 - **Covers:** FR-20
 - **Files:** `App/Shared/Views/ResultView.swift`, `OutlineSidebar.swift`, `PreviewView.swift`, `BlockView.swift`
 - **Do:** UI spec §4 (split view, scroll-to, Show source).
-- **Done when:** manual step 1 passes; TC-UI01 if implemented.
+- **Done when:** manual step 1 passes.
   - *Status corrected from "done":* the prototype's `ResultView` shows a hardcoded
     outline/title/preview; no `OutlineSidebar`/`PreviewView`/`BlockView` split, no real
     `[Block]` rendering, "Show source" reveals a hardcoded Markdown string.
@@ -412,88 +459,25 @@ Definition of Done (every task)
     `CleanTextDocument`, no `DocumentExporter`/`CleanFileWriter` call, and nothing is
     actually written to disk.
 
-### T-057 — Options
-- **Status:** todo
-- **Depends on:** T-050
-- **Covers:** FR-05, FR-12, FR-15, FR-16
-- **Files:** `App/Shared/Views/OptionsView.swift`, `App/Shared/OptionsStore.swift`
-- **Do:** UI spec §5; `@AppStorage` for settings only; macOS `Settings` scene, iOS sheet.
-- **Done when:** toggling each option changes the next extraction (checked with `hidden-content`).
-  - *Status corrected from "done":* the prototype's `OptionsView` holds its toggles in
-    plain `@State` (not `@AppStorage`, not wired to `ExtractionOptions`), isn't reachable
-    from a `Settings` scene/sheet, and has no `OptionsStore.swift`.
-
-### T-058 — iOS/iPadOS adaptations
+### T-058 — iOS adaptations (open/save via Files, iPhone layout)
 - **Status:** todo
 - **Depends on:** T-054, T-055, T-056
 - **Covers:** NFR-04, FR-01
-- **Do:** compact layout (sheets for outline/report), iPad split view, Files save flow, Dynamic Type.
-- **Done when:** manual step 8 passes on iPhone and iPad simulators.
-  - *Status corrected from "done":* not started — no compact/iPad-specific layout exists
-    yet.
-
-### T-059 — Localisation (German) and accessibility pass
-- **Status:** todo
-- **Depends on:** T-051, T-052, T-053, T-054, T-055, T-057
-- **Covers:** NFR-08, NFR-05
-- **Files:** `App/Resources/Localizable.xcstrings`
-- **Tests:** TC-U25, TC-U26.
-- **Done when:** both pass; VoiceOver walk-through done.
-  - *Status corrected from "done":* `Localizable.xcstrings` has exactly one German
-    entry, for T-001's original placeholder text ("Works offline...") which the current
-    prototype UI no longer even uses. The prototype's actual strings (AppModel's sample
-    data, all five views) are hardcoded English literals, not `String(localized:)`/
-    catalog keys — no real localization coverage.
+- **Do:** open a PDF from the Files app, save output to Files, confirm the iPhone layout is
+  usable end to end. iPad split view and a dedicated Dynamic Type pass are descoped for v1.
+- **Done when:** open-from-Files, save-to-Files, and the iPhone layout all work on the iPhone
+  simulator.
+  - *Status corrected from "done":* not started — no Files import/export flow or iPhone
+    layout exists yet.
 
 ## Phase 6 — Hardening and release
 
-### T-060 — Robustness fuzzing
-- **Status:** todo
-- **Depends on:** T-035
-- **Covers:** NFR-06
-- **Tests:** TC-U27.
-- **Done when:** 200 seeded mutations never crash.
-
-### T-061 — Performance and memory
-- **Status:** todo
-- **Depends on:** T-035
-- **Covers:** NFR-03
-- **Do:** profile with Instruments (Time Profiler, Allocations) on `perf-200-pages` and a generated 500-page file; fix hotspots (e.g. raster reuse, masked pixel loops over `UnsafeBufferPointer`).
-- **Tests:** TC-F04, TC-M04.
-- **Done when:** budgets in NFR-03 met in Release.
-
-### T-062 — Coverage gate
-- **Status:** todo
-- **Depends on:** T-035
-- **Covers:** NFR-07
-- **Do:** `make coverage` using `swift test --enable-code-coverage` + `llvm-cov report`; fail below 80 %.
-- **Tests:** TC-Q01.
-
-### T-063 — Offline proof and privacy review
-- **Status:** todo
-- **Depends on:** T-056
-- **Covers:** NFR-01, NFR-02
-- **Do:** TC-M03; review logs in Console.app during a full run; confirm temp folder empty after quit; run the `sanitization-auditor` agent.
-- **Tests:** TC-M03.
-
-### T-064 — Log hygiene test
-- **Status:** todo
-- **Depends on:** T-002
-- **Covers:** NFR-02
-- **Tests:** TC-E03 runs in `make verify`.
-
-### T-065 — README and user guide
+### T-065 — README
 - **Status:** todo
 - **Depends on:** T-058
 - **Covers:** FR-01, FR-21
-- **Do:** update README (install, build, usage, limitations); in-app "About" text explaining what is removed.
-
-### T-066 — XCUITest smoke (optional)
-- **Status:** todo
-- **Depends on:** T-054
-- **Covers:** FR-20
-- **Do:** add `PDFCleanUITests` target to `project.yml`; launch argument `-uiTestOpen <path>` handled by `AppModel` in DEBUG only.
-- **Tests:** TC-UI01, TC-U26.
+- **Do:** a short README: install, build, usage, limitations. No in-app "About" text, no user
+  guide beyond the README — descoped for v1.
 
 ## Backlog (not scheduled for v1)
 

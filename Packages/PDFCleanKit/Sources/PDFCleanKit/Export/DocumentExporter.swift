@@ -85,6 +85,8 @@ public struct DocumentExporter: Sendable {
             return .tableOfContents(heading: redactedHeading, entries: redactedEntries)
         case .preformatted(let text):
             return .preformatted(redactedText(text, identifiers: identifiers))
+        case .math(let math):
+            return .math(MathBlock(text: redactedText(math.text, identifiers: identifiers), kind: math.kind))
         case .pageBreak(let page):
             return .pageBreak(page: page)
         }

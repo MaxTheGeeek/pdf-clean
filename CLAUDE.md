@@ -19,6 +19,8 @@ Only read the parts a task needs; do not paste whole specs into replies.
 - Order inside a task: re-read the referenced spec sections → write/enable tests → implement → `make verify` → update the task's **Status** in `specs/06-tasks.md` → commit `T-0xx: <title>`.
 - Behaviour change not in the spec? Use `/spec-change` first (update requirement, tests, tasks), then code.
 - Finish with the `spec-reviewer` agent; for anything under `Sanitize/`, `Extraction/` or `Export/` also run `sanitization-auditor`.
+- **New project priority**: when the user asks for faithful extraction, the default is visual fidelity and semantic preservation over aggressive normalization. The app must preserve structure and emphasis first; only then remove hidden/injected content.
+- **Implementation gate**: every extraction or rendering task must include at least one fixture or synthetic test covering a title, heading, list, math block, and multi-page continuation before it is considered complete.
 
 ## Commands
 | Purpose | Command |
@@ -48,6 +50,11 @@ Only read the parts a task needs; do not paste whole specs into replies.
 - Deterministic output: no dates, UUIDs or randomness in exports; stable sorts with tie-breakers.
 - Honour PDF permissions (ADR-004): never bypass encryption or copy restrictions.
 - No force unwraps / `try!` in library code; public APIs have `///` docs.
+- **Faithful document reconstruction is the product default**: visible content must be preserved in the same semantic and visual hierarchy as the source PDF, not flattened into a generic plain-text approximation.
+- **Style fidelity required**: title, heading, emphasis, lists, quotes, code blocks, and mathematical expressions must keep their document meaning and visual emphasis. A title with bold or larger font must remain bold or larger in the extracted representation.
+- **Math blocks are first-class content**: formulae and equation blocks are not treated as normal paragraphs. They must be recognised as math regions and preserved in a math-friendly representation (for example: TeX/LaTeX-compatible plain text or equivalent). Inline math and display math are both kept distinct from ordinary prose.
+- **No flattening by default**: do not degrade rich structure into a simple text stream when the source clearly has stronger document semantics.
+- **The extraction result must be faithful to the original file, not just "clean"**: good output is structurally equivalent to the original page layout within the safe, offline, visible-only constraints of the app.
 
 ## Gotchas (learned while writing the spec — do not rediscover)
 - `PDFPage.characterBounds(at:)` uses **UTF-16 offsets** of `page.string`; surrogate pairs (e.g. TAG characters U+E00xx) span two offsets.

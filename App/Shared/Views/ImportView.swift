@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ImportView: View {
     let model: AppModel
+    @State private var showFileImporter = false
+    @State private var isDropTargeted = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -11,9 +13,22 @@ struct ImportView: View {
 
             VStack(spacing: 12) {
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [10, 8]))
-                    .foregroundStyle(.secondary)
+                    .stroke(
+                        isDropTargeted ? Color.accentColor : .secondary,
+                        style: StrokeStyle(lineWidth: 2, dash: [10, 8])
+                    )
+                    .background(isDropTargeted ? Color.accentColor.opacity(0.12) : Color.clear)
                     .frame(width: 560, height: 180)
+                    .contentShape(Rectangle())
+                    .dropDestination(for: URL.self) { urls, _ in
+                        guard let url = urls.first, url.pathExtension.lowercased() == "pdf" else {
+                            return false
+                        }
+                        Task { await model.open(url: url) }
+                        return true
+                    } isTargeted: { isTargeted in
+                        isDropTargeted = isTargeted
+                    }
                     .overlay {
                         VStack(spacing: 8) {
                             Image(systemName: "doc.text.magnifyingglass")
@@ -24,12 +39,25 @@ struct ImportView: View {
                             Text("or")
                                 .foregroundStyle(.secondary)
                             Button {
-                                model.beginProcessing()
+                                showFileImporter = true
                             } label: {
                                 Label("Open PDF…", systemImage: "folder")
                                     .font(.title3)
                             }
                             .buttonStyle(.borderedProminent)
+                            .fileImporter(
+                                isPresented: $showFileImporter,
+                                allowedContentTypes: [.pdf]
+                            ) { result in
+                                switch result {
+                                case .success(let url):
+                                    Task { await model.open(url: url) }
+                                case .failure(let error):
+                                    model.alertTitle = "Open PDF"
+                                    model.alertMessage = "Could not open the selected file: \(error.localizedDescription)"
+                                    model.screen = .failed
+                                }
+                            }
                         }
                     }
             }

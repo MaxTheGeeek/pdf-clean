@@ -8,7 +8,24 @@ public enum Block: Sendable, Equatable, Codable {
     case listItem(ListItem)
     case tableOfContents(heading: String?, entries: [TOCEntry])
     case preformatted(String)
+    case math(MathBlock)
     case pageBreak(page: Int)
+}
+
+/// One inline or display-math region preserved as a math-friendly representation.
+public struct MathBlock: Sendable, Equatable, Codable {
+    public enum Kind: String, Sendable, Equatable, Codable {
+        case inline
+        case display
+    }
+
+    public var text: String
+    public var kind: Kind
+
+    public init(text: String, kind: Kind) {
+        self.text = text
+        self.kind = kind
+    }
 }
 
 /// One item of a bulleted or numbered list (FR-10).

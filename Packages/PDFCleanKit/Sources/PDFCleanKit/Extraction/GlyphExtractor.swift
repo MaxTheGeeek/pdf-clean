@@ -32,6 +32,8 @@ enum GlyphExtractor {
         let length = nsString.length
         let lines = reliableLines(page: page, pageString: pageString)
         var lineCursor = 0
+        var previousLineCursor = -1
+        var previousMaxXInLine: CGFloat?
 
         var glyphs: [Glyph] = []
         glyphs.reserveCapacity(length)
@@ -52,6 +54,10 @@ enum GlyphExtractor {
                 i >= lines[lineCursor].range.location + lines[lineCursor].range.length
             {
                 lineCursor += 1
+            }
+            if lineCursor != previousLineCursor {
+                previousMaxXInLine = nil
+                previousLineCursor = lineCursor
             }
             if lineCursor < lines.count, NSLocationInRange(i, lines[lineCursor].range) {
                 let line = lines[lineCursor]
@@ -78,12 +84,13 @@ enum GlyphExtractor {
                     // character with a horizontally plausible raw X keeps it unchanged.
                     let x: CGFloat
                     let width: CGFloat
-                    if isPlausibleX(of: pageSpaceBox, in: line) {
+                    if isPlausibleX(of: pageSpaceBox, in: line, previousMaxX: previousMaxXInLine) {
                         x = pageSpaceBox.minX
                         width = pageSpaceBox.width
                     } else {
                         (x, width) = interpolatedX(forCharacterAt: i, in: line)
                     }
+                    previousMaxXInLine = x + width
                     pageSpaceBox = CGRect(x: x, y: line.minY, width: width, height: line.maxY - line.minY)
                 }
             }
@@ -187,15 +194,22 @@ enum GlyphExtractor {
     private static let lineXTolerance: CGFloat = 2.0
 
     /// A character's raw X is trustworthy only if it falls within its own line's horizontal
-    /// bounds (± `lineXTolerance`) and isn't degenerate (zero width *and* zero height — a
+    /// bounds (± `lineXTolerance`), isn't degenerate (zero width *and* zero height — a
     /// genuinely zero-width Unicode character still has zero width, but never also zero
-    /// height, so this never flags a legitimate zero-width format character). Observed on real
-    /// fixture text: a handful of characters right before a transition to a differently-drawn
-    /// run (e.g. a right-aligned `drawRightString` footer) get a raw X measured well outside
-    /// their own line, or `(0,0,0,0)` outright.
-    private static func isPlausibleX(of box: CGRect, in line: ReliableLine) -> Bool {
+    /// height, so this never flags a legitimate zero-width format character), and — when
+    /// `previousMaxX` is known — doesn't fall noticeably *before* the previous character on the
+    /// same line. Observed on real fixture text: a handful of characters right before a
+    /// transition to a differently-drawn run (e.g. a right-aligned `drawRightString` footer)
+    /// get a raw X measured well outside their own line, or `(0,0,0,0)` outright — and, more
+    /// subtly, the *last* character of a line can get the *next* line's X, which the bounds
+    /// check alone misses whenever both lines share a left margin (so the bogus X still falls
+    /// inside this line's own bounds). LTR reading order never goes backwards within a line
+    /// (beyond kerning), so a regression there is as implausible as a bounds violation.
+    private static func isPlausibleX(of box: CGRect, in line: ReliableLine, previousMaxX: CGFloat?) -> Bool {
         guard !(box.width <= 0 && box.height <= 0) else { return false }
-        return box.minX >= line.minX - lineXTolerance && box.maxX <= line.maxX + lineXTolerance
+        guard box.minX >= line.minX - lineXTolerance, box.maxX <= line.maxX + lineXTolerance else { return false }
+        if let previousMaxX, box.minX < previousMaxX - lineXTolerance { return false }
+        return true
     }
 
     /// An interpolated position for the character at index `i`, based on its position within

@@ -58,6 +58,8 @@ enum PlainTextRenderer {
             return lines.joined(separator: "\n")
         case .preformatted(let text):
             return text
+        case .math(let math):
+            return math.kind == .display ? "\n\(math.text)\n" : math.text
         case .pageBreak:
             return "* * *"
         }

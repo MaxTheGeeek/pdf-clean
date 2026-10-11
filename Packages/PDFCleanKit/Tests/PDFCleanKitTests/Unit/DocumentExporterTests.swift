@@ -13,6 +13,7 @@ struct DocumentExporterTests {
                 .title("Title \(needle)"),
                 .heading(level: 1, text: "Heading \(needle)"),
                 .paragraph("Paragraph \(needle)."),
+                .math(MathBlock(text: "E = mc^2 \(needle)", kind: .display)),
                 .listItem(ListItem(ordered: false, marker: "-", level: 0, text: "Item \(needle)")),
                 .tableOfContents(
                     heading: "Contents \(needle)",
