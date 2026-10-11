@@ -55,7 +55,7 @@ enum GlyphExtractor {
             }
             if lineCursor < lines.count, NSLocationInRange(i, lines[lineCursor].range) {
                 let line = lines[lineCursor]
-                if let diagonal = line.syntheticDiagonalBoxes {
+                if let diagonal = line.diagonalBoxes {
                     // `characterBounds(at:)` is unreliable across this whole rotated-CTM run
                     // (observed on real fixture text: large, correctly positioned boxes for
                     // some characters, then wildly wrong — seemingly unrelated-glyph — boxes
@@ -65,16 +65,26 @@ enum GlyphExtractor {
                     // "axis-aligned boxes stepping diagonally" pattern it expects.
                     pageSpaceBox = diagonal[i - line.range.location]
                 } else {
-                    // `characterBounds(at:)` occasionally reports the wrong line's Y for the
-                    // last few characters before a line boundary (observed on real fixture
-                    // text — a hyphenated word's tail measured at the *next* line's Y even
-                    // though it textually belongs to the current one). `selectionsByLine()`
-                    // does not have this bug, so its line bounds override just the vertical
-                    // extent here; the horizontal measurement, which is reliable, stays from
-                    // `characterBounds`.
-                    pageSpaceBox = CGRect(
-                        x: pageSpaceBox.minX, y: line.minY, width: pageSpaceBox.width,
-                        height: line.maxY - line.minY)
+                    // `characterBounds(at:)` occasionally reports the wrong line's Y for a few
+                    // characters near a line boundary (observed on real fixture text — a
+                    // hyphenated word's tail measured at the *next* line's Y even though it
+                    // textually belongs to the current one), and occasionally a wrong X too
+                    // (a few characters right before a transition to a differently-drawn run,
+                    // e.g. `drawRightString`, measured well outside their own line's bounds —
+                    // or degenerate (0,0,0,0) altogether). `selectionsByLine()` does not have
+                    // either bug: its line bounds always correct the vertical extent, and —
+                    // only for a character whose own X falls outside them, or is degenerate —
+                    // its index within the line gives a plausible interpolated X too. A
+                    // character with a horizontally plausible raw X keeps it unchanged.
+                    let x: CGFloat
+                    let width: CGFloat
+                    if isPlausibleX(of: pageSpaceBox, in: line) {
+                        x = pageSpaceBox.minX
+                        width = pageSpaceBox.width
+                    } else {
+                        (x, width) = interpolatedX(forCharacterAt: i, in: line)
+                    }
+                    pageSpaceBox = CGRect(x: x, y: line.minY, width: width, height: line.maxY - line.minY)
                 }
             }
 
@@ -119,11 +129,13 @@ enum GlyphExtractor {
 
     private struct ReliableLine {
         var range: NSRange
+        var minX: CGFloat
+        var maxX: CGFloat
         var minY: CGFloat
         var maxY: CGFloat
         /// Set only for a line that looks rotated (tall relative to its width and length):
         /// one synthetic box per UTF-16 unit in `range`, stepping along the line's diagonal.
-        var syntheticDiagonalBoxes: [CGRect]?
+        var diagonalBoxes: [CGRect]?
     }
 
     /// Minimum text length before the "looks rotated" check applies, so a short, naturally
@@ -157,7 +169,9 @@ enum GlyphExtractor {
                 looksRotated(bounds: bounds, length: found.length)
                 ? diagonalBoxes(bounds: bounds, count: found.length) : nil
             result.append(
-                ReliableLine(range: found, minY: bounds.minY, maxY: bounds.maxY, syntheticDiagonalBoxes: diagonal))
+                ReliableLine(
+                    range: found, minX: bounds.minX, maxX: bounds.maxX, minY: bounds.minY, maxY: bounds.maxY,
+                    diagonalBoxes: diagonal))
             cursor = found.location + found.length
         }
         return result
@@ -166,6 +180,33 @@ enum GlyphExtractor {
     private static func looksRotated(bounds: CGRect, length: Int) -> Bool {
         length >= rotatedLineMinLength && bounds.height > rotatedLineMinHeight
             && bounds.height > rotatedLineHeightToWidthRatio * bounds.width
+    }
+
+    /// Horizontal slack (points) allowed beyond a line's own bounds before a character's raw X
+    /// is treated as implausible — rounding and sub-pixel kerning, not a real signal either way.
+    private static let lineXTolerance: CGFloat = 2.0
+
+    /// A character's raw X is trustworthy only if it falls within its own line's horizontal
+    /// bounds (± `lineXTolerance`) and isn't degenerate (zero width *and* zero height — a
+    /// genuinely zero-width Unicode character still has zero width, but never also zero
+    /// height, so this never flags a legitimate zero-width format character). Observed on real
+    /// fixture text: a handful of characters right before a transition to a differently-drawn
+    /// run (e.g. a right-aligned `drawRightString` footer) get a raw X measured well outside
+    /// their own line, or `(0,0,0,0)` outright.
+    private static func isPlausibleX(of box: CGRect, in line: ReliableLine) -> Bool {
+        guard !(box.width <= 0 && box.height <= 0) else { return false }
+        return box.minX >= line.minX - lineXTolerance && box.maxX <= line.maxX + lineXTolerance
+    }
+
+    /// An interpolated position for the character at index `i`, based on its position within
+    /// `line`'s own UTF-16 range and bounding box — used only when the raw `characterBounds` at
+    /// `i` failed `isPlausibleX`.
+    private static func interpolatedX(forCharacterAt i: Int, in line: ReliableLine) -> (x: CGFloat, width: CGFloat) {
+        let length = max(line.range.length, 1)
+        let width = max((line.maxX - line.minX) / CGFloat(length), 1)
+        let t = length > 1 ? CGFloat(i - line.range.location) / CGFloat(length - 1) : 0
+        let center = line.minX + t * (line.maxX - line.minX)
+        return (center - width / 2, width)
     }
 
     /// `count` boxes evenly spaced along the bounding box's diagonal, each roughly
