@@ -45,6 +45,10 @@ enum TOCDetector {
                     heading = trimmed
                     headingIndex = i
                 }
+                // Anything pending before the heading (e.g. a title sharing this page) is not
+                // part of a wrapped TOC entry; drop it rather than merging it into the next one.
+                pendingTitle = nil
+                pendingIndices = []
                 continue
             }
             if let parsed = parseEntry(trimmed) {
