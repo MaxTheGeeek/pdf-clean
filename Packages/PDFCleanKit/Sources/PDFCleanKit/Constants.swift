@@ -63,6 +63,12 @@ public enum Constants {
     public static let titleSizeFactor: Double = 1.4
     /// Heading font size must be at least this × the body font size.
     public static let headingSizeFactor: Double = 1.15
+    /// Minimum gap above a bold candidate line, as a fraction of body line spacing, for it to
+    /// qualify as a heading by the bold-candidate rule (tech spec §6.7.4(b)).
+    public static let headingGapFactor: Double = 1.2
+    /// Maximum gap between two same-style heading candidate lines, as a fraction of body line
+    /// spacing, for them to merge into one heading (tech spec §6.7.4).
+    public static let headingMergeGapFactor: Double = 1.3
     /// Paragraph break threshold, as a fraction of normal line spacing.
     public static let paragraphGapFactor: Double = 1.4
     /// A line shorter than this × column width may end a paragraph.

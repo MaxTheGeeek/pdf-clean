@@ -141,13 +141,22 @@ Definition of Done (every task)
 - **Done when:** 2- and 3-column synthetic pages order correctly.
 
 ### T-022 — Font statistics, title and headings
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-020
 - **Covers:** FR-06, FR-07
 - **Files:** `Layout/FontStatistics.swift`, `Layout/HeadingClassifier.swift`
 - **Do:** tech spec §6.7.3–4 (title incl. recurring-style rule, headings, levels, outline/TOC hints API).
 - **Tests:** TC-U20.
 - **Done when:** synthetic documents classify as specified.
+  - *Spec gap filled during implementation:* the heading rules in §6.7.4(b) ("gap above ≥ 1.2 ×
+    body spacing") and the heading-merge rule ("gap ≤ 1.3 × spacing") use numeric factors that
+    were never added to the §10 constants table. Added `Constants.headingGapFactor` (1.2) and
+    `Constants.headingMergeGapFactor` (1.3) and the matching §10 rows.
+  - *Interpretation:* "numbering depth breaks ties" (§6.7.4) is read as: a heading whose text
+    matches the numbered pattern uses its numbering depth as the level outright, overriding the
+    sorted-distinct-size rank for that heading. This is the only reading under which numbering
+    can actually *break* a tie — two headings sharing one rounded font size would otherwise
+    always share one level under the pure size-rank rule.
 
 ### T-023 — TOC detection
 - **Status:** todo

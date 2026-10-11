@@ -480,6 +480,8 @@ in a monospaced, selectable view.
 | minGutter | 12 pt | XY-cut |
 | titleSizeFactor | 1.4 × body | title |
 | headingSizeFactor | 1.15 × body | headings |
+| headingGapFactor | 1.2 × spacing | bold-candidate heading rule (§6.7.4b) |
+| headingMergeGapFactor | 1.3 × spacing | heading line merge (§6.7.4) |
 | paragraphGapFactor | 1.4 × spacing | paragraphs |
 | shortLineFactor | 0.7 × column width | paragraph end |
 | tocLineRatio | 0.4 (min 4 lines) | TOC pages |
