@@ -51,7 +51,20 @@ Only read the parts a task needs; do not paste whole specs into replies.
 
 ## Gotchas (learned while writing the spec — do not rediscover)
 - `PDFPage.characterBounds(at:)` uses **UTF-16 offsets** of `page.string`; surrogate pairs (e.g. TAG characters U+E00xx) span two offsets.
-- Zero-width/format characters have **empty boxes** but must stay inside their word ("Visi⟨U+200B⟩ble" is one word). Only whitespace/newlines with empty boxes are separators.
+- `characterBounds(at:)` is unreliable right at a line boundary: on real fixture text it reported
+  the *next* line's Y for the last few characters of a hyphenated word still on the *current*
+  line, splitting "infra-" into "in" + "fra-" instead of one word. `PDFSelection.selectionsByLine()`
+  does **not** have this bug — cross-check/override a glyph's vertical extent with the bounds of
+  whichever line (matched by sequential text search) its UTF-16 index falls in; keep
+  `characterBounds`'s horizontal measurement, which is reliable.
+- Zero-width/format characters must stay inside their word ("Visi⟨U+200B⟩ble" is one word);
+  whitespace is *always* a separator regardless of box geometry — PDFKit gives ordinary spaces a
+  real, non-empty advance-width box most of the time, so gating the separator check on an empty
+  box (rather than checking the character itself) silently swallows every space into the word.
+  Conversely, use **zero width** (`box.width <= 0`), not `CGRect.isEmpty`, to detect a "no
+  geometry" glyph: PDFKit occasionally reports a zero-*height* (but non-zero-width) box for an
+  ordinary visible glyph, and `isEmpty` also triggers on that, excluding a real character from
+  gap measurements and folding its width into the next gap.
 - Rotated watermark glyphs come back as axis-aligned boxes stepping diagonally: detect rotated **runs on glyphs before word building**, or they shatter into single letters.
 - `CGContext.drawPDFPage` draws content without annotations (wanted). Bitmap row 0 is the **top** row. Raster test uses unrotated page space; layout uses display space.
 - Measuring ink over the full word box leaks neighbour descenders into hidden words (4.5 %); use the exclusive area (spec §3.2). Insetting the box drops `_` and `.` — don't.

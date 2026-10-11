@@ -222,13 +222,27 @@ Definition of Done (every task)
     at T-035, once `ExtractionPipeline` exists to run fixtures through end to end.
 
 ### T-031 — Glyph extraction and word building
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-030, T-020
 - **Covers:** FR-04, FR-14
 - **Files:** `Extraction/GlyphExtractor.swift`, `Extraction/WordBuilder.swift`
 - **Do:** tech spec §6.2 and §6.4 (UTF-16 offsets, surrogate pairs, zero-width glyphs stay in words, keep both `box` (display space) and `pageBox` (page space), fallback via `selectionsByLine`).
 - **Tests:** TC-U14 plus a fixture-backed test: `simple-structured` page 1 words include "infra-" and "structure".
 - **Done when:** tests pass.
+  - *Spec drift found during implementation:* two real `PDFKit` behaviors contradicted the
+    spec's literal reading (both now in CLAUDE.md's Gotchas so they aren't rediscovered): (1)
+    whitespace must be a separator unconditionally — gating it on an empty box (as a literal
+    reading of §6.2 suggested) swallowed every ordinary space into the surrounding word, since
+    PDFKit gives most spaces a real, non-empty advance box; (2) "empty box" for the
+    zero-width/format-character rule must mean zero *width* (`box.width <= 0`), not
+    `CGRect.isEmpty` — PDFKit occasionally reports a zero-*height* box for an ordinary, fully
+    visible glyph, and `isEmpty` also matches that, excluding a real character from gap
+    measurements. (3) *Implementation workaround, not a rule change:* `characterBounds(at:)` can
+    report the wrong line's Y for the last few characters before a line boundary (confirmed via
+    the `simple-structured` fixture's "infra-"/"structure" hyphenation, which first came out as
+    "in"/"fra-structure"); `GlyphExtractor` now cross-references `selectionsByLine()` — which
+    does not have this bug — to correct each glyph's vertical extent, keeping
+    `characterBounds`'s (reliable) horizontal measurement.
 
 ### T-032 — Glyph-level filters
 - **Status:** todo
