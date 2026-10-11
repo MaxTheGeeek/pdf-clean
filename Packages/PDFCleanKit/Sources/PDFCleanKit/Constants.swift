@@ -77,6 +77,9 @@ public enum Constants {
     public static let tocLineRatio: Double = 0.4
     /// Minimum number of lines for a page to be considered for TOC detection.
     public static let tocMinLines: Int = 4
+    /// Horizontal positions within this many points are treated as one indentation cluster
+    /// (TOC entry levels, list nesting levels).
+    public static let indentationClusterTolerance: CGFloat = 5.0
 
     // MARK: OCR (tech spec §6.5)
 

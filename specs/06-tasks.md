@@ -159,7 +159,7 @@ Definition of Done (every task)
     always share one level under the pure size-rank rule.
 
 ### T-023 — TOC detection
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-022
 - **Covers:** FR-08
 - **Files:** `Layout/TOCDetector.swift`
