@@ -43,7 +43,7 @@ enum UnicodeSanitizer {
                     counts.removedInvisibleCodepoints += 1
                 }
             } else if scalar.value == 0x200C || scalar.value == 0x200D {
-                if shouldKeepJoiner(scalar, previous: previous, next: next) {
+                if UnicodeTables.shouldKeepJoiner(scalar, previous: previous, next: next) {
                     output.append(scalar)
                 } else {
                     counts.removedInvisibleCodepoints += 1
@@ -61,7 +61,7 @@ enum UnicodeSanitizer {
                 counts.removedPrivateUseCodepoints += 1
             } else if UnicodeTables.isUnconditionallyRemoved(scalar) {
                 counts.removedInvisibleCodepoints += 1
-            } else if isUnassignedOrLeftoverFormat(scalar) {
+            } else if UnicodeTables.isUnassignedOrLeftoverFormat(scalar) {
                 counts.removedInvisibleCodepoints += 1
             } else {
                 output.append(scalar)
@@ -83,25 +83,6 @@ enum UnicodeSanitizer {
     private static func isEndOfWord(_ next: Unicode.Scalar?) -> Bool {
         guard let next else { return true }
         return next.properties.generalCategory == .spaceSeparator || next.value == 0x0A || next.value == 0x09
-    }
-
-    private static func shouldKeepJoiner(
-        _ scalar: Unicode.Scalar,
-        previous: Unicode.Scalar?,
-        next: Unicode.Scalar?
-    ) -> Bool {
-        if scalar.value == 0x200D, let previous, let next, previous.properties.isEmoji, next.properties.isEmoji {
-            return true
-        }
-        guard let previous, let next else { return false }
-        guard previous.properties.isAlphabetic, next.properties.isAlphabetic else { return false }
-        guard let previousScript = UnicodeTables.contextScript(of: previous) else { return false }
-        return previousScript == UnicodeTables.contextScript(of: next)
-    }
-
-    private static func isUnassignedOrLeftoverFormat(_ scalar: Unicode.Scalar) -> Bool {
-        let category = scalar.properties.generalCategory
-        return category == .unassigned || category == .format
     }
 
     /// Collapses every Zs character, TAB (outside preformatted) and LF to a single space,

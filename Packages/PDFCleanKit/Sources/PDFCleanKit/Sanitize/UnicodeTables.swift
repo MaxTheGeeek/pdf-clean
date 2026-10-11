@@ -97,6 +97,32 @@ enum UnicodeTables {
         }
     }
 
+    /// Unassigned (Cn) or leftover Cf code points not covered by the explicit removal
+    /// list — the fallback branch of §6 step 3.
+    static func isUnassignedOrLeftoverFormat(_ scalar: Unicode.Scalar) -> Bool {
+        let category = scalar.properties.generalCategory
+        return category == .unassigned || category == .format
+    }
+
+    /// `true` when a ZWNJ/ZWJ between `previous` and `next` should be kept (§6.1 context
+    /// exceptions): between two emoji (ZWJ only), or between two letters of the same
+    /// script among the ones this type tracks. Shared by `UnicodeSanitizer` (decides
+    /// whether to remove one) and `OutputVerifier` (decides whether a surviving one is a
+    /// violation).
+    static func shouldKeepJoiner(
+        _ scalar: Unicode.Scalar,
+        previous: Unicode.Scalar?,
+        next: Unicode.Scalar?
+    ) -> Bool {
+        if scalar.value == 0x200D, let previous, let next, previous.properties.isEmoji, next.properties.isEmoji {
+            return true
+        }
+        guard let previous, let next else { return false }
+        guard previous.properties.isAlphabetic, next.properties.isAlphabetic else { return false }
+        guard let previousScript = contextScript(of: previous) else { return false }
+        return previousScript == contextScript(of: next)
+    }
+
     /// The small, explicit set of scripts relevant to the ZWNJ/ZWJ context exception
     /// (sanitisation spec §6.1). Not a general Unicode Script property implementation —
     /// deliberately limited to the scripts the spec names.

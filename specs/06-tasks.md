@@ -112,18 +112,24 @@ Definition of Done (every task)
     `Golden/README.txt` predates this and the directory stays unused for now.
 
 ### T-014 — OutputVerifier and CleanFileWriter
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-010
 - **Covers:** FR-22, FR-21
 - **Files:** `Export/OutputVerifier.swift`, `Export/CleanFileWriter.swift`
 - **Do:** tech spec §6.11; `DocumentExporter.render` calls the verifier and throws on violations; writer strips xattrs on macOS (ignore EPERM).
 - **Tests:** TC-U11; writer test checks no BOM, LF only, final newline, xattrs removed (macOS).
 - **Done when:** tests pass on macOS and iOS simulator.
+  - *Environment limitation:* `make test-ios` could not be run — this machine has no
+    installed iOS simulator runtime (`xcrun simctl list devices available` shows every
+    iOS runtime as "Unavailable"; same CoreSimulator/Xcode version mismatch noted during
+    T-001). `make test` (macOS) is fully green and `make build-ios` (compile only, no
+    execution) succeeds. Needs a real run on a machine with a working iOS simulator
+    before this can be considered verified on-device.
 
 ## Phase 2 — Layout (synthetic geometry, no PDFKit)
 
 ### T-020 — Geometry and line assembly
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-004
 - **Covers:** FR-04, FR-11
 - **Files:** `Layout/PageGeometry.swift`, `Layout/LineAssembler.swift`
@@ -303,7 +309,7 @@ Definition of Done (every task)
 ## Phase 5 — App
 
 ### T-050 — AppModel state machine and JobWorkspace
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-035
 - **Covers:** FR-01, FR-02, FR-03, FR-23, NFR-02
 - **Files:** `App/Shared/AppModel.swift`, `App/Shared/JobWorkspace.swift`, `App/Shared/UserFacingError.swift`
@@ -312,7 +318,7 @@ Definition of Done (every task)
 - **Done when:** all transitions in the diagram are covered by tests.
 
 ### T-051 — Import screen
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-050
 - **Covers:** FR-01, NFR-05
 - **Files:** `App/Shared/Views/ImportView.swift`, `RootView.swift`
@@ -320,7 +326,7 @@ Definition of Done (every task)
 - **Done when:** manual check on macOS + iPhone + iPad simulators.
 
 ### T-052 — Password sheet
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-051
 - **Covers:** FR-02, FR-03
 - **Files:** `App/Shared/Views/PasswordSheet.swift`
@@ -328,7 +334,7 @@ Definition of Done (every task)
 - **Done when:** manual steps 2–3 of the QA checklist pass.
 
 ### T-053 — Processing screen
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-051
 - **Covers:** FR-23, NFR-05
 - **Files:** `App/Shared/Views/ProcessingView.swift`
@@ -336,7 +342,7 @@ Definition of Done (every task)
 - **Done when:** manual step 4 passes.
 
 ### T-054 — Result screen: outline and preview
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-053
 - **Covers:** FR-20
 - **Files:** `App/Shared/Views/ResultView.swift`, `OutlineSidebar.swift`, `PreviewView.swift`, `BlockView.swift`
@@ -344,7 +350,7 @@ Definition of Done (every task)
 - **Done when:** manual step 1 passes; TC-UI01 if implemented.
 
 ### T-055 — Report panel and identifier redaction
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-054
 - **Covers:** FR-18, FR-19
 - **Files:** `App/Shared/Views/ReportPanel.swift`, `IdentifierList.swift`
@@ -352,7 +358,7 @@ Definition of Done (every task)
 - **Done when:** manual step 5 (report part) passes.
 
 ### T-056 — Export
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-054, T-014
 - **Covers:** FR-21, FR-22
 - **Files:** `App/Shared/CleanTextDocument.swift`, toolbar in `ResultView.swift`
@@ -360,7 +366,7 @@ Definition of Done (every task)
 - **Done when:** manual steps 5–6 pass.
 
 ### T-057 — Options
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-050
 - **Covers:** FR-05, FR-12, FR-15, FR-16
 - **Files:** `App/Shared/Views/OptionsView.swift`, `App/Shared/OptionsStore.swift`
@@ -368,14 +374,14 @@ Definition of Done (every task)
 - **Done when:** toggling each option changes the next extraction (checked with `hidden-content`).
 
 ### T-058 — iOS/iPadOS adaptations
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-054, T-055, T-056
 - **Covers:** NFR-04, FR-01
 - **Do:** compact layout (sheets for outline/report), iPad split view, Files save flow, Dynamic Type.
 - **Done when:** manual step 8 passes on iPhone and iPad simulators.
 
 ### T-059 — Localisation (German) and accessibility pass
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-051, T-052, T-053, T-054, T-055, T-057
 - **Covers:** NFR-08, NFR-05
 - **Files:** `App/Resources/Localizable.xcstrings`

@@ -7,23 +7,34 @@ public struct DocumentExporter: Sendable {
     public init() {}
 
     /// Renders `document` as `format`, applying `options.redactedIdentifiers` without
-    /// mutating `document` itself.
+    /// mutating `document` itself, then runs `OutputVerifier` on the result and throws
+    /// `PipelineError.outputVerificationFailed` if it finds anything — nothing is
+    /// returned in that case (constitution P2).
     ///
-    /// Does not yet run `OutputVerifier` — that gate is wired in by T-014.
+    /// `OutputVerifier`'s source-metadata-value check needs the transient values
+    /// collected at ingest, which this type never sees (constitution P4); that part of
+    /// the gate is exercised by `ExtractionPipeline` (T-035), not here.
     public func render(
         _ document: ExtractedDocument,
         as format: ExportFormat,
         options: ExportOptions = ExportOptions()
     ) throws -> String {
         let redactedDocument = redacted(document, identifiers: options.redactedIdentifiers)
+        let rendered: String
         switch format {
         case .markdown:
-            return MarkdownRenderer.render(redactedDocument)
+            rendered = MarkdownRenderer.render(redactedDocument)
         case .html:
-            return HTMLRenderer.render(redactedDocument)
+            rendered = HTMLRenderer.render(redactedDocument)
         case .plainText:
-            return PlainTextRenderer.render(redactedDocument)
+            rendered = PlainTextRenderer.render(redactedDocument)
         }
+
+        let violations = OutputVerifier.verify(rendered)
+        guard violations.isEmpty else {
+            throw PipelineError.outputVerificationFailed(violations)
+        }
+        return rendered
     }
 
     /// `<original-stem>-clean.<ext>`, stem sanitised to `[A-Za-z0-9 ._-]`; falls back to
