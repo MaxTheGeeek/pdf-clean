@@ -471,6 +471,7 @@ in a monospaced, selectable view.
 | headerFooterMaxSizeFactor | 1.05 × body | header/footer font cap |
 | repeatedLineMaxSizeFactor | 1.15 × body | Rule B font cap (headings never removed) |
 | offPageMinInside | 0.5 of glyph area | off-page glyphs |
+| cjkVerticalExceptionRatio | 0.8 | rotated-run CJK/Hangul/Kana exception |
 | diagonalMaxStep | 2.0 × size | rotated-run neighbour distance |
 | minRotatedRun | 3 glyphs | rotated runs |
 | repeatRatio | 0.5 (and ≥ 2 pages) | repeated lines |

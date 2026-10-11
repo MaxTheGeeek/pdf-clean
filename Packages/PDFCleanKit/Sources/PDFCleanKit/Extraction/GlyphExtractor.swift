@@ -30,7 +30,7 @@ enum GlyphExtractor {
         let rotation = page.rotation
         let nsString = pageString as NSString
         let length = nsString.length
-        let lineYRanges = reliableLineYRanges(page: page, pageString: pageString)
+        let lines = reliableLines(page: page, pageString: pageString)
         var lineCursor = 0
 
         var glyphs: [Glyph] = []
@@ -48,21 +48,34 @@ enum GlyphExtractor {
             if isSurrogatePair {
                 pageSpaceBox = pageSpaceBox.union(page.characterBounds(at: i + 1))
             }
-            // `characterBounds(at:)` occasionally reports the wrong line's Y for the last few
-            // characters before a line boundary (observed on real fixture text — a hyphenated
-            // word's tail measured at the *next* line's Y even though it textually belongs to
-            // the current one). `selectionsByLine()` does not have this bug, so its line bounds
-            // override just the vertical extent here; the horizontal measurement, which is
-            // reliable, stays from `characterBounds`.
-            while lineCursor < lineYRanges.count,
-                i >= lineYRanges[lineCursor].range.location + lineYRanges[lineCursor].range.length
+            while lineCursor < lines.count,
+                i >= lines[lineCursor].range.location + lines[lineCursor].range.length
             {
                 lineCursor += 1
             }
-            if lineCursor < lineYRanges.count, NSLocationInRange(i, lineYRanges[lineCursor].range) {
-                let line = lineYRanges[lineCursor]
-                pageSpaceBox = CGRect(
-                    x: pageSpaceBox.minX, y: line.minY, width: pageSpaceBox.width, height: line.maxY - line.minY)
+            if lineCursor < lines.count, NSLocationInRange(i, lines[lineCursor].range) {
+                let line = lines[lineCursor]
+                if let diagonal = line.syntheticDiagonalBoxes {
+                    // `characterBounds(at:)` is unreliable across this whole rotated-CTM run
+                    // (observed on real fixture text: large, correctly positioned boxes for
+                    // some characters, then wildly wrong — seemingly unrelated-glyph — boxes
+                    // for the rest). `selectionsByLine()`'s one bounding box for the run is
+                    // reliable; synthesize evenly spaced boxes stepping along its diagonal so
+                    // the rotated-run detector (sanitisation spec §2.3) still sees the
+                    // "axis-aligned boxes stepping diagonally" pattern it expects.
+                    pageSpaceBox = diagonal[i - line.range.location]
+                } else {
+                    // `characterBounds(at:)` occasionally reports the wrong line's Y for the
+                    // last few characters before a line boundary (observed on real fixture
+                    // text — a hyphenated word's tail measured at the *next* line's Y even
+                    // though it textually belongs to the current one). `selectionsByLine()`
+                    // does not have this bug, so its line bounds override just the vertical
+                    // extent here; the horizontal measurement, which is reliable, stays from
+                    // `characterBounds`.
+                    pageSpaceBox = CGRect(
+                        x: pageSpaceBox.minX, y: line.minY, width: pageSpaceBox.width,
+                        height: line.maxY - line.minY)
+                }
             }
 
             let font = attributed.attribute(.font, at: i, effectiveRange: nil) as? PlatformFont
@@ -102,30 +115,71 @@ enum GlyphExtractor {
         }
     }
 
-    // MARK: - Reliable per-line Y (works around a `characterBounds(at:)` quirk)
+    // MARK: - Reliable per-line geometry (works around `characterBounds(at:)` quirks)
+
+    private struct ReliableLine {
+        var range: NSRange
+        var minY: CGFloat
+        var maxY: CGFloat
+        /// Set only for a line that looks rotated (tall relative to its width and length):
+        /// one synthetic box per UTF-16 unit in `range`, stepping along the line's diagonal.
+        var syntheticDiagonalBoxes: [CGRect]?
+    }
+
+    /// Minimum text length before the "looks rotated" check applies, so a short, naturally
+    /// near-square line (e.g. a single digit) is never misclassified.
+    private static let rotatedLineMinLength = 4
+    /// A line taller than this fraction of its own width is "looks rotated" — normal running
+    /// text of any real length is far wider than it is tall.
+    private static let rotatedLineHeightToWidthRatio: CGFloat = 0.5
+    /// Minimum absolute height (points) before "looks rotated" applies, ruling out ordinary
+    /// short lines that are merely a little taller than wide.
+    private static let rotatedLineMinHeight: CGFloat = 20
 
     /// Maps each `selectionsByLine()` line to the UTF-16 range it occupies in `pageString`, by
-    /// searching for each line's text in turn starting after the previous match. `pageString`
+    /// searching for each line's text in turn starting after the previous match (`pageString`
     /// and the lines are both already in reading order, so this is a simple, fast sequential
-    /// scan — not a general substring search.
-    private static func reliableLineYRanges(
-        page: PDFPage, pageString: String
-    ) -> [(range: NSRange, minY: CGFloat, maxY: CGFloat)] {
+    /// scan, not a general substring search) — plus, for a line whose bounding box looks
+    /// rotated, synthetic per-character boxes stepping along its diagonal.
+    private static func reliableLines(page: PDFPage, pageString: String) -> [ReliableLine] {
         guard let fullSelection = page.selection(for: page.bounds(for: .cropBox)) else { return [] }
         let nsString = pageString as NSString
         let length = nsString.length
         var cursor = 0
-        var result: [(range: NSRange, minY: CGFloat, maxY: CGFloat)] = []
+        var result: [ReliableLine] = []
         for lineSelection in fullSelection.selectionsByLine() {
             guard let text = lineSelection.string, !text.isEmpty, cursor < length else { continue }
             let searchRange = NSRange(location: cursor, length: length - cursor)
             let found = nsString.range(of: text, range: searchRange)
             guard found.location != NSNotFound else { continue }
             let bounds = lineSelection.bounds(for: page)
-            result.append((found, bounds.minY, bounds.maxY))
+            let diagonal =
+                looksRotated(bounds: bounds, length: found.length)
+                ? diagonalBoxes(bounds: bounds, count: found.length) : nil
+            result.append(
+                ReliableLine(range: found, minY: bounds.minY, maxY: bounds.maxY, syntheticDiagonalBoxes: diagonal))
             cursor = found.location + found.length
         }
         return result
+    }
+
+    private static func looksRotated(bounds: CGRect, length: Int) -> Bool {
+        length >= rotatedLineMinLength && bounds.height > rotatedLineMinHeight
+            && bounds.height > rotatedLineHeightToWidthRatio * bounds.width
+    }
+
+    /// `count` boxes evenly spaced along the bounding box's diagonal, each roughly
+    /// glyph-sized — reproduces the "axis-aligned boxes stepping diagonally" shape genuine
+    /// rotated text would have, for a run whose individual `characterBounds` cannot be trusted.
+    private static func diagonalBoxes(bounds: CGRect, count: Int) -> [CGRect] {
+        guard count > 0 else { return [] }
+        let boxSize = max(min(bounds.width, bounds.height) / CGFloat(count), 1)
+        return (0..<count).map { k in
+            let t = count > 1 ? CGFloat(k) / CGFloat(count - 1) : 0
+            let cx = bounds.minX + t * bounds.width
+            let cy = bounds.minY + t * bounds.height
+            return CGRect(x: cx - boxSize / 2, y: cy - boxSize / 2, width: boxSize, height: boxSize)
+        }
     }
 
     // MARK: - Font traits

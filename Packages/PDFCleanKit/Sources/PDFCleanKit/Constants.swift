@@ -29,6 +29,9 @@ public enum Constants {
     public static let diagonalMaxStep: Double = 2.0
     /// Minimum fraction of a glyph's area inside the page to not be considered off-page.
     public static let offPageMinInside: Double = 0.5
+    /// A candidate rotated run is kept (not dropped) when at least this fraction of its glyphs
+    /// are CJK/Hangul/Kana — genuine vertical writing, not a diagonal watermark.
+    public static let cjkVerticalExceptionRatio: Double = 0.8
 
     // MARK: Overlap dedupe (sanitisation spec §4)
 

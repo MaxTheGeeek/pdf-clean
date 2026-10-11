@@ -245,13 +245,22 @@ Definition of Done (every task)
     `characterBounds`'s (reliable) horizontal measurement.
 
 ### T-032 — Glyph-level filters
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-031
 - **Covers:** FR-13
 - **Files:** `Sanitize/GlyphFilter.swift`
 - **Do:** sanitisation spec §2.
 - **Tests:** TC-U13; on `hidden-content` the run "CANARY-ROTATED" is removed as one run per page.
 - **Done when:** tests pass.
+  - *Spec gap filled during implementation:* the CJK/Hangul/Kana vertical-writing exception's
+    "≥ 80%" was never added to the §10 constants table. Added `Constants.cjkVerticalExceptionRatio`
+    (0.8) with a matching §10 row.
+  - *Spec drift found during implementation (GlyphExtractor, T-031):* the real `CANARY-ROTATED`
+    watermark (`c.rotate(45)` + `drawString`, sanitisation spec's own example) was not detected
+    at first — `characterBounds(at:)` is unreliable across a rotated-CTM run (see CLAUDE.md's
+    Gotchas). Fixed by detecting a `selectionsByLine()` line that "looks rotated" (tall relative
+    to its width and length) and synthesizing evenly spaced diagonal boxes for its characters
+    instead of trusting `characterBounds`. Confirmed removed on both pages of `hidden-content`.
 
 ### T-033 — Visibility filter and overlap dedupe
 - **Status:** todo
