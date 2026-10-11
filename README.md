@@ -61,6 +61,18 @@ Review agents: `spec-reviewer` (conformance to the specs) and `sanitization-audi
 | `App/` | SwiftUI app shared by macOS and iOS |
 | `scripts/` | gates, fixture generator/verifier, executable reference of the visibility algorithm |
 
+## GitHub Actions
+Pushes and pull requests to `main` run `make verify` and build downloadable macOS DMG and
+iPhone Simulator ZIP artifacts. These are unsigned CI builds; the simulator ZIP cannot be
+installed on a physical iPhone.
+
+To build a signed iPhone IPA for TestFlight/App Store Connect, configure the `ios-signing`
+GitHub environment with `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64`,
+`IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`, `IOS_APP_STORE_PROFILE_BASE64`, and `IOS_TEAM_ID`,
+then run **iOS device IPA** manually with `build_ipa` enabled. Use an Apple Distribution
+certificate and an App Store provisioning profile matching the app bundle ID. The workflows
+create build artifacts only; macOS notarization and App Store upload are not configured.
+
 ## Test fixtures
 `Packages/PDFCleanKit/Tests/PDFCleanKitTests/Fixtures/` holds 12 generated PDFs and
 `manifest.json` (15 cases) describing exactly what each output must and must not

@@ -241,6 +241,8 @@ final class AppModel {
                 return heading ?? "Table of contents"
             case .preformatted(let text):
                 return text
+            case .math(let math):
+                return math.text
             case .pageBreak(let page):
                 return "Page \(page)"
             }
