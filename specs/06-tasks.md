@@ -208,13 +208,18 @@ Definition of Done (every task)
 ## Phase 3 — PDF extraction (PDFKit, CoreGraphics, Vision)
 
 ### T-030 — DocumentOpener and SourceInventory
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-004
 - **Covers:** FR-02, FR-03, FR-17, FR-19, NFR-06
 - **Files:** `Ingest/DocumentOpener.swift`, `Ingest/SourceInventoryBuilder.swift`, `Ingest/MetadataValues.swift` (transient values for the verifier)
 - **Do:** tech spec §6.1. Owner-password path via `permissionsStatus == .owner`.
 - **Tests:** TC-U29; fixture cases `not-a-pdf`, `truncated`, `encrypted-*`, `copy-restricted*` enabled in TC-F01.
 - **Done when:** those fixture cases pass.
+  - *Scope note:* `DocumentOpener`/`SourceInventoryBuilder`/`MetadataValues` are implemented and
+    covered directly against the real fixture PDFs (`DocumentOpenerTests`,
+    `SourceInventoryBuilderTests` — all password/copy/header/inventory paths pass). The literal
+    "enabled in TC-F01" wiring (replacing `FixtureSuiteTests`'s "pipeline pending" stub) happens
+    at T-035, once `ExtractionPipeline` exists to run fixtures through end to end.
 
 ### T-031 — Glyph extraction and word building
 - **Status:** todo
