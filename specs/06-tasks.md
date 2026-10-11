@@ -309,84 +309,121 @@ Definition of Done (every task)
 ## Phase 5 — App
 
 ### T-050 — AppModel state machine and JobWorkspace
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-035
 - **Covers:** FR-01, FR-02, FR-03, FR-23, NFR-02
 - **Files:** `App/Shared/AppModel.swift`, `App/Shared/JobWorkspace.swift`, `App/Shared/UserFacingError.swift`
 - **Do:** tech spec §9.1 and §9.3 (temp copy, cleanup, launch purge), error mapping §8.
 - **Tests:** TC-U30 (JobWorkspace lives in the package as `Pipeline/JobWorkspace.swift` so it is testable) and AppModel state-transition tests with a fake pipeline protocol.
 - **Done when:** all transitions in the diagram are covered by tests.
+  - *Status corrected from "done":* a click-through visual prototype exists (committed —
+    "App: visual prototype for Import/Password/Processing/Result/Options screens") with
+    `AppModel` driving screen switching off hardcoded sample data, useful for reviewing
+    the design before the real pipeline exists. It does not meet this task's Definition
+    of Done: no `JobWorkspace`, no `UserFacingError`, no `PipelineError` mapping, no
+    tests, and it cannot really be done before — its own dependency, T-035
+    (`ExtractionPipeline`) — exists, since there is nothing real to wire the state
+    machine to yet.
 
 ### T-051 — Import screen
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-050
 - **Covers:** FR-01, NFR-05
 - **Files:** `App/Shared/Views/ImportView.swift`, `RootView.swift`
 - **Do:** UI spec §1; `.fileImporter`, `.dropDestination`, non-PDF banner, ⌘O.
 - **Done when:** manual check on macOS + iPhone + iPad simulators.
+  - *Status corrected from "done":* the prototype's `ImportView` has no `.fileImporter`
+    or `.dropDestination` — its buttons just call `model.beginProcessing()`/
+    `model.requirePassword()` directly to preview the other screens. Real file import
+    is still to do.
 
 ### T-052 — Password sheet
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-051
 - **Covers:** FR-02, FR-03
 - **Files:** `App/Shared/Views/PasswordSheet.swift`
 - **Do:** UI spec §2 (user vs owner variants).
 - **Done when:** manual steps 2–3 of the QA checklist pass.
+  - *Status corrected from "done":* the prototype's sheet is a visual shell (title/detail
+    text swap for the owner-password variant) with no real password verification against
+    a document — `Unlock` just advances the mock state.
 
 ### T-053 — Processing screen
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-051
 - **Covers:** FR-23, NFR-05
 - **Files:** `App/Shared/Views/ProcessingView.swift`
 - **Do:** UI spec §3 with Esc/Cancel.
 - **Done when:** manual step 4 passes.
+  - *Status corrected from "done":* the prototype shows a static hardcoded progress
+    value/stage, not real `PipelineProgress` events from a running pipeline.
 
 ### T-054 — Result screen: outline and preview
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-053
 - **Covers:** FR-20
 - **Files:** `App/Shared/Views/ResultView.swift`, `OutlineSidebar.swift`, `PreviewView.swift`, `BlockView.swift`
 - **Do:** UI spec §4 (split view, scroll-to, Show source).
 - **Done when:** manual step 1 passes; TC-UI01 if implemented.
+  - *Status corrected from "done":* the prototype's `ResultView` shows a hardcoded
+    outline/title/preview; no `OutlineSidebar`/`PreviewView`/`BlockView` split, no real
+    `[Block]` rendering, "Show source" reveals a hardcoded Markdown string.
 
 ### T-055 — Report panel and identifier redaction
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-054
 - **Covers:** FR-18, FR-19
 - **Files:** `App/Shared/Views/ReportPanel.swift`, `IdentifierList.swift`
 - **Do:** UI spec §4 Cleaned panel; tooltips; Redact all.
 - **Done when:** manual step 5 (report part) passes.
+  - *Status corrected from "done":* the prototype's side panel lists hardcoded strings
+    inline in `ResultView`; `ReportPanel.swift`/`IdentifierList.swift` don't exist, and
+    there is no real `SanitizationReport`/`IdentifierFinding` data or "Redact all" action.
 
 ### T-056 — Export
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-054, T-014
 - **Covers:** FR-21, FR-22
 - **Files:** `App/Shared/CleanTextDocument.swift`, toolbar in `ResultView.swift`
 - **Do:** tech spec §9.3 export; format picker; ⌘S; post-export xattr strip on macOS; verification failure alert.
 - **Done when:** manual steps 5–6 pass.
+  - *Status corrected from "done":* the prototype's "Save…" button calls
+    `model.completeProcessing()` (a no-op re-trigger of the mock state) — there is no
+    `CleanTextDocument`, no `DocumentExporter`/`CleanFileWriter` call, and nothing is
+    actually written to disk.
 
 ### T-057 — Options
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-050
 - **Covers:** FR-05, FR-12, FR-15, FR-16
 - **Files:** `App/Shared/Views/OptionsView.swift`, `App/Shared/OptionsStore.swift`
 - **Do:** UI spec §5; `@AppStorage` for settings only; macOS `Settings` scene, iOS sheet.
 - **Done when:** toggling each option changes the next extraction (checked with `hidden-content`).
+  - *Status corrected from "done":* the prototype's `OptionsView` holds its toggles in
+    plain `@State` (not `@AppStorage`, not wired to `ExtractionOptions`), isn't reachable
+    from a `Settings` scene/sheet, and has no `OptionsStore.swift`.
 
 ### T-058 — iOS/iPadOS adaptations
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-054, T-055, T-056
 - **Covers:** NFR-04, FR-01
 - **Do:** compact layout (sheets for outline/report), iPad split view, Files save flow, Dynamic Type.
 - **Done when:** manual step 8 passes on iPhone and iPad simulators.
+  - *Status corrected from "done":* not started — no compact/iPad-specific layout exists
+    yet.
 
 ### T-059 — Localisation (German) and accessibility pass
-- **Status:** done
+- **Status:** todo
 - **Depends on:** T-051, T-052, T-053, T-054, T-055, T-057
 - **Covers:** NFR-08, NFR-05
 - **Files:** `App/Resources/Localizable.xcstrings`
 - **Tests:** TC-U25, TC-U26.
 - **Done when:** both pass; VoiceOver walk-through done.
+  - *Status corrected from "done":* `Localizable.xcstrings` has exactly one German
+    entry, for T-001's original placeholder text ("Works offline...") which the current
+    prototype UI no longer even uses. The prototype's actual strings (AppModel's sample
+    data, all five views) are hardcoded English literals, not `String(localized:)`/
+    catalog keys — no real localization coverage.
 
 ## Phase 6 — Hardening and release
 
