@@ -486,6 +486,8 @@ in a monospaced, selectable view.
 | shortLineFactor | 0.7 × column width | paragraph end |
 | tocLineRatio | 0.4 (min 4 lines) | TOC pages |
 | indentationClusterTolerance | 5 pt | TOC entry / list nesting levels |
+| listContinuationAlignmentTolerance | 3 pt | list item continuation lines |
+| preformattedGapFactor | 2.0 × size | preformatted/table-like line detection |
 | ocrDPI | 300 | OCR render |
 | ocrMinInkCoverage | 0.005 | OCR trigger |
 | maxPages / maxBytes / warnPages | 2000 / 500 MB / 300 | NFR-06 |

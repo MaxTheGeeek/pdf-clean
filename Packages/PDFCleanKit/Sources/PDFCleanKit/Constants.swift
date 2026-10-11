@@ -80,6 +80,11 @@ public enum Constants {
     /// Horizontal positions within this many points are treated as one indentation cluster
     /// (TOC entry levels, list nesting levels).
     public static let indentationClusterTolerance: CGFloat = 5.0
+    /// Maximum left-edge deviation (points) for a line to count as a list item's continuation.
+    public static let listContinuationAlignmentTolerance: CGFloat = 3.0
+    /// A line gap wider than this × font size is a "table-like" internal gap (preformatted
+    /// detection).
+    public static let preformattedGapFactor: Double = 2.0
 
     // MARK: OCR (tech spec §6.5)
 

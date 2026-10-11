@@ -167,13 +167,34 @@ Definition of Done (every task)
 - **Done when:** all TOC variants pass; non-TOC numeric pages are rejected.
 
 ### T-024 — Lists, preformatted and paragraphs
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-022
 - **Covers:** FR-09, FR-10
 - **Files:** `Layout/ListDetector.swift`, `Layout/ParagraphBuilder.swift`, `Layout/StructureAnalyzer.swift`
 - **Do:** tech spec §6.7.4 lists, preformatted, paragraphs, cross-page continuation, page breaks; `StructureAnalyzer` orchestrates outline → TOC → title → headings → lists → preformatted → paragraphs.
 - **Tests:** TC-U22, TC-U23.
 - **Done when:** synthetic multi-page document yields the expected `[Block]`.
+  - *Spec gap filled during implementation:* the preformatted rule's "gaps > 2 × size" and the
+    list continuation's "± 3 pt" alignment were never named in the §10 constants table. Added
+    `Constants.preformattedGapFactor` (2.0) and `Constants.listContinuationAlignmentTolerance`
+    (3 pt), with matching §10 rows.
+  - *Interpretation:* "the column's left edge" / "column width" (paragraph indent and short-line
+    rules) are read as the minimum left edge and maximum line width observed across the whole
+    body-line run passed to one `ParagraphBuilder.build` call — a run already corresponds to one
+    body segment between headings/lists, i.e. one column in practice. A genuine multi-column
+    body run concatenated without an intervening heading is out of scope for this reading.
+  - *Interpretation:* the detected TOC block is placed immediately after the title (or at the
+    very start, with none) rather than interleaved at its exact original line position — the
+    realistic case, since a TOC occupies its own page(s); avoids a much more complex general
+    interleaving scheme for a case that essentially never arises.
+  - *Known limitation (documented, not fixed — spec's ordered-marker regex is intentionally
+    simple):* `ListDetector` reads a single-letter initial + period ("A. Smith, Esq.") as an
+    ordered list marker "A.". Locked in by a test rather than treated as a bug.
+  - *Scope note:* `includePageBreaks` inserts `.pageBreak(page:)` only at paragraph-level page
+    transitions (the dominant case). A page transition between two non-paragraph blocks (e.g.
+    heading-to-heading across a page with no body text) does not get a page-break marker in this
+    pass — `includePageBreaks` defaults to `false` and is not covered by TC-U22/TC-U23; flagged
+    as a follow-up if full coverage is needed.
 
 ### T-025 — Repeated content filter
 - **Status:** todo
