@@ -132,7 +132,7 @@ Definition of Done (every task)
 - **Done when:** rotation cases and RTL ordering pass.
 
 ### T-021 — Reading order (XY-cut)
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-020
 - **Covers:** FR-11
 - **Files:** `Layout/ReadingOrder.swift`
