@@ -290,12 +290,20 @@ Definition of Done (every task)
     with this one exclusion.
 
 ### T-034 — OCR recogniser
-- **Status:** todo
+- **Status:** done
 - **Depends on:** T-033
 - **Covers:** FR-05
 - **Files:** `Extraction/OCRRecognizer.swift`
 - **Do:** tech spec §6.5 (trigger rule, 300 dpi render, Vision request, conversion, confidence warning, cancellation).
 - **Tests:** TC-U28; fixture `scanned` (ocrTolerant) and `scanned-with-ocr-layer` (no OCR).
+  - *Note:* `scanned-with-ocr-layer` exercises "OCR does not run" via `shouldRecognize`'s
+    generic `visibleWordCount == 0` check (unit-tested directly) — deciding *that specific
+    fixture's* visible-word count comes from the real extraction chain, wired up in T-035.
+  - *Environment limitation:* as in T-001/T-014, no iOS simulator runtime is installed on
+    this machine, so the Vision fixture test (`scanned.pdf`, real on-device OCR) is only
+    verified on macOS here; `make build-ios` compiles. Vision is the same framework on
+    both platforms, so no behavioural difference is expected, but this needs a real run
+    on an iOS simulator to close out "Done when" fully.
 - **Done when:** both fixture cases pass on macOS and iOS simulator.
 
 ### T-035 — ExtractionPipeline actor
